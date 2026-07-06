@@ -1,5 +1,6 @@
 import type { MotorComponent } from '../../../engine/types';
 import { motorBodySize } from '../layout';
+import { INDICATOR_ORANGE, LABEL_DARK, LABEL_MUTED, METAL, METAL_STROKE, PLASTIC_DARK, PLASTIC_LIGHT_PANEL } from '../theme';
 
 export function MotorSymbol({ comp, voltageAcross, current }: { comp: MotorComponent; voltageAcross: number; current: number }) {
   const size = motorBodySize(comp.ratedHp);
@@ -24,20 +25,20 @@ export function MotorSymbol({ comp, voltageAcross, current }: { comp: MotorCompo
           : undefined
       }
     >
-      <line x1={cx - 20} y1={size - 12} x2={0} y2={size} stroke="#9ca3af" strokeWidth={3} />
-      <line x1={cx + 20} y1={size - 12} x2={size} y2={size} stroke="#9ca3af" strokeWidth={3} />
+      <line x1={cx - 20} y1={size - 12} x2={0} y2={size} stroke="#7d828a" strokeWidth={3} />
+      <line x1={cx + 20} y1={size - 12} x2={size} y2={size} stroke="#7d828a" strokeWidth={3} />
 
       {/* Terminal box */}
-      <rect x={cx - 12} y={size - 16} width={24} height={12} rx={2} fill="#475569" stroke="#94a3b8" strokeWidth={1} />
+      <rect x={cx - 12} y={size - 16} width={24} height={12} fill={PLASTIC_DARK} stroke={METAL} strokeWidth={1} />
 
       {/* Rear shaft nub */}
-      <circle cx={cx} cy={cy} r={4} fill="#334155" />
-      <rect x={cx - 4} y={2} width={8} height={10} rx={2} fill="#475569" />
+      <circle cx={cx} cy={cy} r={4} fill="#1c1e21" />
+      <rect x={cx - 4} y={2} width={8} height={10} fill={METAL} stroke={METAL_STROKE} strokeWidth={0.75} />
 
       {/* Body with metallic gradient look via layered circles */}
-      <circle cx={cx} cy={cy} r={r} fill="#3f4b5e" stroke="#64748b" strokeWidth={2.5} />
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1e293b" strokeWidth={1} strokeDasharray="3 5" />
-      <circle cx={cx - r * 0.3} cy={cy - r * 0.35} r={r * 0.35} fill="#ffffff" opacity={0.04} />
+      <circle cx={cx} cy={cy} r={r} fill="#4a5058" stroke={METAL_STROKE} strokeWidth={2.5} />
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1c1e21" strokeWidth={1} strokeDasharray="3 5" />
+      <circle cx={cx - r * 0.3} cy={cy - r * 0.35} r={r * 0.35} fill="#ffffff" opacity={0.05} />
 
       {/* Cooling fins */}
       {Array.from({ length: 12 }).map((_, i) => {
@@ -46,7 +47,7 @@ export function MotorSymbol({ comp, voltageAcross, current }: { comp: MotorCompo
         const y1 = cy + Math.sin(angle) * (r - 6);
         const x2 = cx + Math.cos(angle) * r;
         const y2 = cy + Math.sin(angle) * r;
-        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#1e293b" strokeWidth={2} />;
+        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#1c1e21" strokeWidth={2} />;
       })}
 
       <g
@@ -56,23 +57,23 @@ export function MotorSymbol({ comp, voltageAcross, current }: { comp: MotorCompo
             : undefined
         }
       >
-        <circle cx={cx} cy={cy} r={r * 0.55} fill="#57677e" stroke="#94a3b8" strokeWidth={1.5} />
-        <line x1={cx} y1={cy - r * 0.5} x2={cx} y2={cy + r * 0.5} stroke="#cbd5e1" strokeWidth={2.5} />
-        <line x1={cx - r * 0.5} y1={cy} x2={cx + r * 0.5} y2={cy} stroke="#cbd5e1" strokeWidth={2.5} />
+        <circle cx={cx} cy={cy} r={r * 0.55} fill="#575d66" stroke={METAL} strokeWidth={1.5} />
+        <line x1={cx} y1={cy - r * 0.5} x2={cx} y2={cy + r * 0.5} stroke="#c9cdd3" strokeWidth={2.5} />
+        <line x1={cx - r * 0.5} y1={cy} x2={cx + r * 0.5} y2={cy} stroke="#c9cdd3" strokeWidth={2.5} />
       </g>
 
-      <circle cx={cx} cy={cy} r={5} fill="#94a3b8" />
+      <circle cx={cx} cy={cy} r={5} fill={METAL} />
 
       {comp.burnedOut && (
         <g>
-          <line x1={cx - r * 0.5} y1={cy - r * 0.5} x2={cx + r * 0.5} y2={cy + r * 0.5} stroke="#57534e" strokeWidth={2.5} />
-          <line x1={cx + r * 0.5} y1={cy - r * 0.5} x2={cx - r * 0.5} y2={cy + r * 0.5} stroke="#57534e" strokeWidth={2.5} />
+          <line x1={cx - r * 0.5} y1={cy - r * 0.5} x2={cx + r * 0.5} y2={cy + r * 0.5} stroke="#1c1917" strokeWidth={2.5} />
+          <line x1={cx + r * 0.5} y1={cy - r * 0.5} x2={cx - r * 0.5} y2={cy + r * 0.5} stroke="#1c1917" strokeWidth={2.5} />
         </g>
       )}
 
       {isStalledAndDrawingCurrent && (
         <g>
-          <path d={`M ${cx} 4 Q ${cx + 6} -6 ${cx} -14 Q ${cx - 6} -20 ${cx} -28`} stroke="#94a3b8" strokeWidth={2} fill="none" opacity={0.7}>
+          <path d={`M ${cx} 4 Q ${cx + 6} -6 ${cx} -14 Q ${cx - 6} -20 ${cx} -28`} stroke="#8b909a" strokeWidth={2} fill="none" opacity={0.7}>
             <animate
               attributeName="d"
               dur="1.4s"
@@ -82,20 +83,20 @@ export function MotorSymbol({ comp, voltageAcross, current }: { comp: MotorCompo
                       M ${cx} 4 Q ${cx + 6} -6 ${cx} -14 Q ${cx - 6} -20 ${cx} -28`}
             />
           </path>
-          <text x={cx} y={-34} textAnchor="middle" fontSize={8} fontWeight={700} fill="#f59e0b">
-            متعثر (Stall)
+          <text x={cx} y={-34} textAnchor="middle" fontSize={8} fontWeight={700} fill={INDICATOR_ORANGE}>
+            STALL
           </text>
         </g>
       )}
 
       {/* Nameplate */}
-      <rect x={cx - 16} y={cy + r * 0.62} width={32} height={12} rx={2} fill="#e2e8f0" opacity={0.9} />
-      <text x={cx} y={cy + r * 0.62 + 9} textAnchor="middle" fontSize={7} fontWeight={700} fill="#1e293b">
+      <rect x={cx - 16} y={cy + r * 0.62} width={32} height={12} fill={PLASTIC_LIGHT_PANEL} opacity={0.95} />
+      <text x={cx} y={cy + r * 0.62 + 9} textAnchor="middle" fontSize={7} fontWeight={700} fill={LABEL_DARK}>
         {comp.ratedHp} HP
       </text>
 
-      <text x={cx} y={size + 16} textAnchor="middle" fontSize={9} fontWeight={700} fill="#94a3b8">
-        {comp.burnedOut ? 'محترق' : ''}
+      <text x={cx} y={size + 16} textAnchor="middle" fontSize={8.5} fontWeight={700} fill={LABEL_MUTED}>
+        {comp.burnedOut ? '· FAULT' : ''}
       </text>
     </g>
   );

@@ -20,12 +20,9 @@ if (typeof window !== 'undefined') {
   window.addEventListener('pointerdown', unlock, { once: true, passive: true });
 }
 
-let soundEnabled = true;
+let soundEnabled = false;
 export function setSoundEnabled(enabled: boolean) {
   soundEnabled = enabled;
-}
-export function isSoundEnabled() {
-  return soundEnabled;
 }
 
 function noiseBuffer(c: AudioContext, durationSec: number): AudioBuffer {
@@ -99,59 +96,3 @@ export function playSpark() {
   trem.stop(now + 0.42);
 }
 
-interface Hum {
-  osc: OscillatorNode;
-  gain: GainNode;
-}
-
-const hums = new Map<string, Hum>();
-
-/** Continuous motor hum, keyed by component id so each motor has its own voice. */
-export function setMotorHum(id: string, opts: { active: boolean; frequency: number; volume: number }) {
-  const c = getCtx();
-  if (!c) return;
-  const now = c.currentTime;
-
-  if (!opts.active || !soundEnabled) {
-    const existing = hums.get(id);
-    if (existing) {
-      existing.gain.gain.cancelScheduledValues(now);
-      existing.gain.gain.setValueAtTime(existing.gain.gain.value, now);
-      existing.gain.gain.linearRampToValueAtTime(0, now + 0.15);
-      existing.osc.stop(now + 0.16);
-      hums.delete(id);
-    }
-    return;
-  }
-
-  let hum = hums.get(id);
-  if (!hum) {
-    const osc = c.createOscillator();
-    const gain = c.createGain();
-    osc.type = 'triangle';
-    osc.frequency.value = opts.frequency;
-    gain.gain.value = 0;
-    osc.connect(gain).connect(c.destination);
-    osc.start(now);
-    hum = { osc, gain };
-    hums.set(id, hum);
-    hum.gain.gain.linearRampToValueAtTime(opts.volume, now + 0.12);
-  } else {
-    hum.osc.frequency.cancelScheduledValues(now);
-    hum.osc.frequency.linearRampToValueAtTime(opts.frequency, now + 0.12);
-    hum.gain.gain.cancelScheduledValues(now);
-    hum.gain.gain.linearRampToValueAtTime(opts.volume, now + 0.12);
-  }
-}
-
-export function stopAllHums() {
-  const c = getCtx();
-  const now = c?.currentTime ?? 0;
-  for (const [, hum] of hums) {
-    hum.gain.gain.cancelScheduledValues(now);
-    hum.gain.gain.setValueAtTime(hum.gain.gain.value, now);
-    hum.gain.gain.linearRampToValueAtTime(0, now + 0.1);
-    hum.osc.stop(now + 0.12);
-  }
-  hums.clear();
-}

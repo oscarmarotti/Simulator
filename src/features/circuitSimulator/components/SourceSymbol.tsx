@@ -1,10 +1,17 @@
 import type { SourceComponent } from '../../../engine/types';
-
-const LINE_COLORS = ['#f87171', '#facc15', '#4ade80'];
+import {
+  INDICATOR_GREEN,
+  LABEL_MUTED,
+  LINE_COLORS,
+  METAL,
+  METAL_STROKE,
+  NEUTRAL_COLOR,
+  PLASTIC_DARK,
+  PLASTIC_DARK_HI,
+  PLASTIC_DARK_STROKE,
+} from '../theme';
 
 export function SourceSymbol({ comp }: { comp: SourceComponent }) {
-  const pct = Math.min(1, Math.max(0, (comp.voltage - 100) / (260 - 100)));
-  const glow = comp.on ? 0.35 + pct * 0.55 : 0.08;
   const isThree = comp.phase === 'three';
   const bodyW = isThree ? 130 : 100;
   const bodyH = isThree ? 168 : 80;
@@ -12,9 +19,9 @@ export function SourceSymbol({ comp }: { comp: SourceComponent }) {
   const panelW = bodyW - panelX - 8;
   const panelY = 8;
   const panelH = bodyH - 16;
-  const scopeCx = panelX + panelW / 2;
-  const scopeCy = isThree ? 66 : 40;
-  const scopeR = isThree ? 34 : 26;
+  const screenCx = panelX + panelW / 2;
+  const screenY = 12;
+  const screenH = isThree ? 60 : 34;
 
   const lineTerminals = isThree ? ['L1', 'L2', 'L3'] : ['L'];
   const lineYs = isThree ? [24, 56, 88] : [26];
@@ -22,90 +29,89 @@ export function SourceSymbol({ comp }: { comp: SourceComponent }) {
 
   return (
     <g>
-      {/* Enclosure */}
-      <rect x={0} y={0} width={bodyW} height={bodyH} rx={8} fill="#1e293b" stroke="#475569" strokeWidth={2.5} />
-      <rect x={3} y={3} width={bodyW - 6} height={10} rx={3} fill="#334155" />
-      <text x={bodyW / 2} y={11} textAnchor="middle" fontSize={7} fontWeight={700} fill="#94a3b8">
-        {isThree ? '3-PHASE AC SOURCE 50Hz' : 'AC SOURCE 50Hz'}
+      {/* Enclosure: dark control-panel unit */}
+      <rect x={0} y={0} width={bodyW} height={bodyH} fill={PLASTIC_DARK} stroke={PLASTIC_DARK_STROKE} strokeWidth={2} />
+      <rect x={0} y={0} width={bodyW} height={7} fill={PLASTIC_DARK_HI} opacity={0.5} />
+      <text x={bodyW / 2} y={bodyH - 4} textAnchor="middle" fontSize={6} fontWeight={700} fill={LABEL_MUTED}>
+        {isThree ? '3~ AC SUPPLY 50Hz' : '1~ AC SUPPLY 50Hz'}
       </text>
 
-      {/* Lead stubs */}
+      {/* Lead stubs + terminal screws */}
       {lineTerminals.map((name, i) => (
-        <line
-          key={name}
-          x1={0}
-          y1={lineYs[i]}
-          x2={panelX - 8}
-          y2={lineYs[i]}
-          stroke={LINE_COLORS[i]}
-          strokeWidth={4}
-        />
+        <g key={name}>
+          <line x1={0} y1={lineYs[i]} x2={panelX - 8} y2={lineYs[i]} stroke={LINE_COLORS[i]} strokeWidth={3.5} />
+          <circle cx={panelX - 8} cy={lineYs[i]} r={2.6} fill={METAL} stroke={METAL_STROKE} strokeWidth={0.9} />
+        </g>
       ))}
-      <line x1={0} y1={neutralY} x2={panelX - 8} y2={neutralY} stroke="#60a5fa" strokeWidth={4} />
+      <line x1={0} y1={neutralY} x2={panelX - 8} y2={neutralY} stroke={NEUTRAL_COLOR} strokeWidth={3.5} />
+      <circle cx={panelX - 8} cy={neutralY} r={2.6} fill={METAL} stroke={METAL_STROKE} strokeWidth={0.9} />
 
-      {/* Panel + scope */}
-      <rect x={panelX} y={panelY} width={panelW} height={panelH} rx={6} fill="#0f172a" stroke="#334155" strokeWidth={1.5} />
-      <circle cx={scopeCx} cy={scopeCy} r={scopeR} fill="#052e1b" stroke="#14532d" strokeWidth={2} />
-      <circle cx={scopeCx} cy={scopeCy} r={scopeR - 4} fill="none" stroke={`rgba(74,222,128,${glow})`} strokeWidth={1.5} />
+      {/* Panel + digital readout */}
+      <rect x={panelX} y={panelY} width={panelW} height={panelH} fill="#0d0f11" stroke="#000" strokeWidth={1.5} />
+      <rect x={panelX + 4} y={screenY} width={panelW - 8} height={screenH} fill="#0a1c12" stroke="#173a24" strokeWidth={1.2} />
+
+      {/* Waveform trace(s) - amber/green LED-style */}
       {(isThree ? [0, 1, 2] : [0]).map((i) => (
         <path
           key={i}
-          d={`M ${scopeCx - scopeR + 6} ${scopeCy} Q ${scopeCx - scopeR / 2 + 6} ${scopeCy - (scopeR - 10)} ${scopeCx + 6} ${scopeCy} T ${scopeCx + scopeR - 6} ${scopeCy}`}
+          d={`M ${panelX + 8} ${screenY + screenH / 2} Q ${panelX + panelW / 4} ${screenY + 6} ${panelX + panelW / 2} ${screenY + screenH / 2} T ${panelX + panelW - 8} ${screenY + screenH / 2}`}
           fill="none"
-          stroke={comp.on ? LINE_COLORS[i] : '#334155'}
-          strokeWidth={1.6}
-          strokeLinecap="round"
-          opacity={comp.on ? 0.5 + pct * 0.5 : 0.4}
-          transform={isThree ? `translate(${(i - 1) * 4}, 0)` : undefined}
+          stroke={comp.on ? INDICATOR_GREEN : '#1f3327'}
+          strokeWidth={1.3}
+          opacity={comp.on ? 0.85 : 0.5}
+          transform={isThree ? `translate(0, ${(i - 1) * (screenH / 5)})` : undefined}
         />
       ))}
 
-      {/* Voltage readout */}
-      <text x={scopeCx} y={panelY + panelH + 2} textAnchor="middle" fontSize={0} />
-      <rect x={panelX + 6} y={panelY + panelH - 20} width={panelW - 12} height={16} rx={3} fill="#111827" />
+      <rect x={panelX + 6} y={panelY + panelH - 22} width={panelW - 12} height={17} fill="#050607" />
       <text
-        x={scopeCx}
-        y={panelY + panelH - 8}
+        x={screenCx}
+        y={panelY + panelH - 9}
         textAnchor="middle"
-        fontSize={10}
-        fontWeight={800}
-        fill={comp.on ? '#4ade80' : '#374151'}
+        fontSize={10.5}
+        fontWeight={700}
+        fill={comp.on ? INDICATOR_GREEN : '#2a3a2f'}
+        fontFamily="'Courier New', monospace"
       >
         {Math.round(comp.voltage)}V
       </text>
 
-      {/* Power rocker switch */}
-      <g>
-        <rect x={panelX} y={4} width={22} height={0} />
-      </g>
+      {/* Power rocker switch - matches SwitchSymbol styling */}
       <rect
         x={isThree ? bodyW - 26 : bodyW - 24}
-        y={isThree ? bodyH - 30 : bodyH - 26}
+        y={isThree ? bodyH - 34 : bodyH - 28}
         width={18}
         height={20}
-        rx={4}
-        fill={comp.on ? '#4ade80' : '#475569'}
-        stroke="#1e293b"
-        strokeWidth={1.2}
+        fill="#1b1d20"
+        stroke="#000"
+        strokeWidth={1}
+      />
+      <rect
+        x={isThree ? bodyW - 24 : bodyW - 22}
+        y={comp.on ? (isThree ? bodyH - 32 : bodyH - 26) : isThree ? bodyH - 21 : bodyH - 15}
+        width={14}
+        height={9}
+        fill={comp.on ? INDICATOR_GREEN : '#4a4f57'}
+        style={{ transition: 'y 130ms ease' }}
       />
       <text
         x={isThree ? bodyW - 17 : bodyW - 15}
-        y={isThree ? bodyH - 14 : bodyH - 10}
+        y={isThree ? bodyH - 6 : bodyH - 4}
         textAnchor="middle"
-        fontSize={6.5}
+        fontSize={5.5}
         fontWeight={700}
-        fill="#0f172a"
+        fill={LABEL_MUTED}
       >
         {comp.on ? 'ON' : 'OFF'}
       </text>
 
       {/* Terminal labels */}
       {lineTerminals.map((name, i) => (
-        <text key={name} x={10} y={lineYs[i] - 6} textAnchor="middle" fontSize={9} fontWeight={700} fill={LINE_COLORS[i]}>
+        <text key={name} x={12} y={lineYs[i] - 6} textAnchor="middle" fontSize={8} fontWeight={700} fill={LINE_COLORS[i]}>
           {name}
         </text>
       ))}
-      <text x={10} y={neutralY - 6} textAnchor="middle" fontSize={9} fontWeight={700} fill="#60a5fa">
+      <text x={12} y={neutralY - 6} textAnchor="middle" fontSize={8} fontWeight={700} fill={NEUTRAL_COLOR}>
         N
       </text>
     </g>

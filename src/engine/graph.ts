@@ -41,6 +41,9 @@ export function getEdgeSpecs(c: CircuitComponent): EdgeSpec[] {
       // Multiple poles trip together (common trip mechanism): the tripped
       // flag is shared, but each pole is its own edge so its own current can
       // be read out (a 3-phase breaker trips if ANY single pole overloads).
+      // A breaker also acts as a manual disconnect: "closed" is the operator
+      // handle position, independent of a fault trip.
+      const conductive = c.closed && !c.tripped;
       if (c.poles === 1) {
         return [
           {
@@ -49,10 +52,10 @@ export function getEdgeSpecs(c: CircuitComponent): EdgeSpec[] {
             edgeName: 'main',
             t1: tid(c.id, 'in'),
             t2: tid(c.id, 'out'),
-            r: c.tripped ? R_OFF : R_ON,
+            r: conductive ? R_ON : R_OFF,
             isLoad: false,
             isProtector: true,
-            conductive: !c.tripped,
+            conductive,
           },
         ];
       }
@@ -64,10 +67,10 @@ export function getEdgeSpecs(c: CircuitComponent): EdgeSpec[] {
           edgeName: `pole${i}`,
           t1: tid(c.id, `in${i}`),
           t2: tid(c.id, `out${i}`),
-          r: c.tripped ? R_OFF : R_ON,
+          r: conductive ? R_ON : R_OFF,
           isLoad: false,
           isProtector: true,
-          conductive: !c.tripped,
+          conductive,
         });
       }
       return edges;

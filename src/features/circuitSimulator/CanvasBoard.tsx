@@ -42,6 +42,7 @@ interface Props {
   components: PlacedComponent[];
   wires: Wire[];
   result: CircuitResult;
+  editable: boolean;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
   onMove: (id: string, x: number, y: number) => void;
@@ -51,7 +52,7 @@ interface Props {
 }
 
 export const CanvasBoard = forwardRef<SVGSVGElement, Props>(function CanvasBoard(
-  { components, wires, result, selectedId, onSelect, onMove, onAddWire, onRemoveWire, onTap },
+  { components, wires, result, editable, selectedId, onSelect, onMove, onAddWire, onRemoveWire, onTap },
   ref,
 ) {
   const [drag, setDrag] = useState<DragState>(null);
@@ -102,16 +103,18 @@ export const CanvasBoard = forwardRef<SVGSVGElement, Props>(function CanvasBoard
   const handleBodyPointerDown = (e: React.PointerEvent<SVGGElement>, id: string) => {
     const svg = e.currentTarget.ownerSVGElement;
     if (!svg) return;
+    onSelect(id);
+    setSelectedWireId(null);
+    if (!editable) return; // layout is locked while running - selection only
     svg.setPointerCapture(e.pointerId);
     const comp = components.find((c) => c.id === id);
     if (!comp) return;
     const p = clientToSvgPoint(svg, e.clientX, e.clientY);
-    onSelect(id);
-    setSelectedWireId(null);
     setDrag({ kind: 'move', id, offsetX: p.x - comp.x, offsetY: p.y - comp.y, pointerId: e.pointerId });
   };
 
   const handleTerminalPointerDown = (e: React.PointerEvent<SVGCircleElement>, id: string, terminal: string) => {
+    if (!editable) return; // no rewiring while running
     const svg = e.currentTarget.ownerSVGElement;
     if (!svg) return;
     svg.setPointerCapture(e.pointerId);
@@ -263,6 +266,7 @@ export const CanvasBoard = forwardRef<SVGSVGElement, Props>(function CanvasBoard
           liveWireIds={liveWireIds}
           highlightedWireIds={highlightedWireIds}
           selectedWireId={selectedWireId}
+          editable={editable}
           onWireTap={handleWireTap}
           onDeleteWire={onRemoveWire}
           draft={draft}

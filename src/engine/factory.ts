@@ -28,7 +28,7 @@ export function makeMcb(
   curve: McbComponent['curve'] = 'C',
   poles: PoleCount = 1,
 ): McbComponent {
-  return { id, type: 'mcb', rating, curve, poles, tripped: false };
+  return { id, type: 'mcb', rating, curve, poles, closed: true, tripped: false };
 }
 
 export function makeSwitch(id: string, on = true): SwitchComponent {

@@ -1,4 +1,5 @@
 import type { LampComponent } from '../../../engine/types';
+import { LABEL_MUTED } from '../theme';
 
 export function LampSymbol({ comp, powerW }: { comp: LampComponent; powerW: number }) {
   const brightness = comp.burnedOut ? 0 : Math.min(1, powerW / comp.ratedPowerW);
@@ -6,8 +7,8 @@ export function LampSymbol({ comp, powerW }: { comp: LampComponent; powerW: numb
 
   return (
     <g>
-      <line x1={28} y1={84} x2={0} y2={88} stroke="#9ca3af" strokeWidth={3} />
-      <line x1={52} y1={84} x2={80} y2={88} stroke="#9ca3af" strokeWidth={3} />
+      <line x1={28} y1={84} x2={0} y2={88} stroke="#7d828a" strokeWidth={3} />
+      <line x1={52} y1={84} x2={80} y2={88} stroke="#7d828a" strokeWidth={3} />
 
       {!comp.burnedOut && brightness > 0.02 && (
         <>
@@ -43,14 +44,14 @@ export function LampSymbol({ comp, powerW }: { comp: LampComponent; powerW: numb
         />
       )}
 
-      <rect x={28} y={64} width={24} height={20} rx={2} fill="#94a3b8" stroke="#64748b" />
-      <line x1={28} y1={68} x2={52} y2={68} stroke="#64748b" strokeWidth={1.5} />
-      <line x1={28} y1={73} x2={52} y2={73} stroke="#64748b" strokeWidth={1.5} />
-      <line x1={28} y1={78} x2={52} y2={78} stroke="#64748b" strokeWidth={1.5} />
-      <path d="M 30 84 Q 40 90 50 84" stroke="#64748b" strokeWidth={3} fill="none" />
+      <rect x={28} y={64} width={24} height={20} fill="#a98a55" stroke="#7d6640" />
+      <line x1={28} y1={68} x2={52} y2={68} stroke="#7d6640" strokeWidth={1.5} />
+      <line x1={28} y1={73} x2={52} y2={73} stroke="#7d6640" strokeWidth={1.5} />
+      <line x1={28} y1={78} x2={52} y2={78} stroke="#7d6640" strokeWidth={1.5} />
+      <path d="M 30 84 Q 40 90 50 84" stroke="#7d6640" strokeWidth={3} fill="none" />
 
-      <text x={40} y={12} textAnchor="middle" fontSize={9} fontWeight={700} fill="#94a3b8">
-        {comp.ratedPowerW}W {comp.burnedOut ? '- محترقة' : ''}
+      <text x={40} y={12} textAnchor="middle" fontSize={8.5} fontWeight={700} fill={LABEL_MUTED}>
+        {comp.ratedPowerW}W {comp.burnedOut ? '· FAULT' : ''}
       </text>
     </g>
   );

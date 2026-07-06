@@ -41,6 +41,7 @@ export interface McbComponent extends BaseComponent {
   rating: number; // A: 6,10,16,20,25,32,40
   curve: BreakerCurve;
   poles: PoleCount;
+  closed: boolean; // manual operator position, independent of a trip
   tripped: boolean;
 }
 

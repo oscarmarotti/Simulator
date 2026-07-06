@@ -8,6 +8,7 @@ export function WireLayer({
   liveWireIds,
   highlightedWireIds,
   selectedWireId,
+  editable,
   onWireTap,
   onDeleteWire,
   draft,
@@ -17,6 +18,7 @@ export function WireLayer({
   liveWireIds: Set<string>;
   highlightedWireIds: Set<string>;
   selectedWireId: string | null;
+  editable: boolean;
   onWireTap: (id: string) => void;
   onDeleteWire: (id: string) => void;
   draft?: { x1: number; y1: number; x2: number; y2: number } | null;
@@ -83,7 +85,7 @@ export function WireLayer({
                 <animate attributeName="stroke-dashoffset" from="24" to="0" dur="0.6s" repeatCount="indefinite" />
               </path>
             )}
-            {selectedWireId === w.id && (
+            {editable && selectedWireId === w.id && (
               <g
                 transform={`translate(${midX}, ${midY})`}
                 onPointerDown={(e) => {

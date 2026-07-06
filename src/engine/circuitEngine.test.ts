@@ -367,4 +367,21 @@ describe('solveCircuit', () => {
     expect(result.devices['lamp1'].current).toBeCloseTo(0, 5);
     expect(result.devices['lamp1'].voltageAcross).toBeCloseTo(0, 5);
   });
+
+  it('manually opening a healthy (untripped) breaker also cuts power, like a real disconnect switch', () => {
+    const source = makeSource('src', 220);
+    const mcb = makeMcb('mcb1', 16, 'C');
+    const lamp = makeLamp('lamp1', 100, 220);
+    const components: CircuitComponent[] = [{ ...mcb, closed: false }, source, lamp];
+    const wires: Wire[] = [
+      wire('w1', 'src', 'L', 'mcb1', 'in'),
+      wire('w2', 'mcb1', 'out', 'lamp1', 'in'),
+      wire('w3', 'lamp1', 'out', 'src', 'N'),
+    ];
+
+    const result = solveCircuit(components, wires);
+    expect(result.devices['lamp1'].current).toBeCloseTo(0, 5);
+    const updatedMcb = result.components.find((c) => c.id === 'mcb1');
+    expect(updatedMcb && 'tripped' in updatedMcb && updatedMcb.tripped).toBe(false);
+  });
 });

@@ -61,11 +61,17 @@ export function useCircuitBoard() {
     );
   }, []);
 
+  const toggleMcbClosed = useCallback((id: string) => {
+    setComponents((prev) =>
+      prev.map((c) => (c.id === id && c.type === 'mcb' ? { ...c, closed: !c.closed } : c)),
+    );
+  }, []);
+
   const resetDevice = useCallback((id: string) => {
     setComponents((prev) =>
       prev.map((c) => {
         if (c.id !== id) return c;
-        if (c.type === 'mcb') return { ...c, tripped: false };
+        if (c.type === 'mcb') return { ...c, tripped: false, closed: true };
         if (c.type === 'fuse') return { ...c, blown: false };
         if (c.type === 'lamp' || c.type === 'motor') return { ...c, burnedOut: false };
         return c;
@@ -98,6 +104,7 @@ export function useCircuitBoard() {
     removeWire,
     updateComponent,
     toggleSwitch,
+    toggleMcbClosed,
     resetDevice,
     result,
   };

@@ -9,13 +9,15 @@ const POLE_COUNTS: PoleCount[] = [1, 2, 3, 4];
 interface Props {
   comp: PlacedComponent | null;
   device?: DeviceResult;
+  canOperate: boolean;
   onUpdate: (id: string, patch: Record<string, unknown>) => void;
   onRemove: (id: string) => void;
   onReset: (id: string) => void;
   onToggleSwitch: (id: string) => void;
+  onToggleMcbClosed: (id: string) => void;
 }
 
-export function Inspector({ comp, device, onUpdate, onRemove, onReset, onToggleSwitch }: Props) {
+export function Inspector({ comp, device, canOperate, onUpdate, onRemove, onReset, onToggleSwitch, onToggleMcbClosed }: Props) {
   if (!comp) {
     return (
       <div className="inspector card">
@@ -43,9 +45,13 @@ export function Inspector({ comp, device, onUpdate, onRemove, onReset, onToggleS
 
       {comp.type === 'source' && (
         <>
-          <button className="btn" onClick={() => onUpdate(comp.id, { on: !comp.on })}>
-            {comp.on ? 'إيقاف المصدر (OFF)' : 'تشغيل المصدر (ON)'}
-          </button>
+          {canOperate ? (
+            <button className="btn" onClick={() => onUpdate(comp.id, { on: !comp.on })}>
+              {comp.on ? 'إيقاف المصدر (OFF)' : 'تشغيل المصدر (ON)'}
+            </button>
+          ) : (
+            <p className="inspector__hint-inline">شغّل الدائرة عشان تقدر تفتح/تقفل المصدر.</p>
+          )}
           <label className="field">
             <span>نوع الجهد</span>
             <div className="segmented">
@@ -84,6 +90,11 @@ export function Inspector({ comp, device, onUpdate, onRemove, onReset, onToggleS
 
       {comp.type === 'mcb' && (
         <>
+          {!comp.tripped && canOperate && (
+            <button className="btn" onClick={() => onToggleMcbClosed(comp.id)}>
+              {comp.closed ? 'فصل يدويًا (Open)' : 'توصيل يدويًا (Close)'}
+            </button>
+          )}
           <label className="field">
             <span>عدد الأقطاب (Poles)</span>
             <div className="segmented">
@@ -136,11 +147,14 @@ export function Inspector({ comp, device, onUpdate, onRemove, onReset, onToggleS
         </>
       )}
 
-      {comp.type === 'switch' && (
-        <button className="btn" onClick={() => onToggleSwitch(comp.id)}>
-          {comp.on ? 'إيقاف (OFF)' : 'تشغيل (ON)'}
-        </button>
-      )}
+      {comp.type === 'switch' &&
+        (canOperate ? (
+          <button className="btn" onClick={() => onToggleSwitch(comp.id)}>
+            {comp.on ? 'إيقاف (OFF)' : 'تشغيل (ON)'}
+          </button>
+        ) : (
+          <p className="inspector__hint-inline">شغّل الدائرة عشان تقدر تفتح/تقفل المفتاح.</p>
+        ))}
 
       {comp.type === 'fuse' && (
         <>

@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import type { CircuitResult } from '../../engine/types';
 import { CanvasBoard } from './CanvasBoard';
 import { ComponentPalette } from './ComponentPalette';
 import { Inspector } from './Inspector';
@@ -7,26 +8,35 @@ import { useCircuitBoard } from './useCircuitBoard';
 import { useCircuitSounds } from './useCircuitSounds';
 import './CircuitSimulator.css';
 
+const EMPTY_RESULT: CircuitResult = { components: [], devices: {}, warnings: [], liveWireIds: [] };
+
 export function CircuitSimulator() {
   const board = useCircuitBoard();
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const [soundOn, setSoundOn] = useState(true);
+  const [soundOn, setSoundOn] = useState(false);
+  const [mode, setMode] = useState<'edit' | 'play'>('edit');
+  const isPlaying = mode === 'play';
 
-  useCircuitSounds(board.components, board.result);
+  const displayResult: CircuitResult = isPlaying ? board.result : EMPTY_RESULT;
+
+  useCircuitSounds(board.components, displayResult);
 
   const selected = board.components.find((c) => c.id === board.selectedId) ?? null;
-  const selectedDevice = board.selectedId ? board.result.devices[board.selectedId] : undefined;
+  const selectedDevice = board.selectedId ? displayResult.devices[board.selectedId] : undefined;
 
   const handleTap = (id: string) => {
     const comp = board.components.find((c) => c.id === id);
     if (!comp) return;
     board.setSelectedId(id);
+    if (!isPlaying) return; // edit mode: tapping only selects for the inspector
     if (comp.type === 'switch') {
       board.toggleSwitch(id);
     } else if (comp.type === 'source') {
       board.updateComponent(id, { on: !comp.on });
     } else if (comp.type === 'mcb' && comp.tripped) {
       board.resetDevice(id);
+    } else if (comp.type === 'mcb') {
+      board.toggleMcbClosed(id);
     } else if (comp.type === 'fuse' && comp.blown) {
       board.resetDevice(id);
     } else if ((comp.type === 'lamp' || comp.type === 'motor') && comp.burnedOut) {
@@ -41,10 +51,34 @@ export function CircuitSimulator() {
     });
   };
 
-  const showUnprotectedShortWarning = board.result.warnings.includes('SHORT_CIRCUIT_UNPROTECTED');
+  const showUnprotectedShortWarning = displayResult.warnings.includes('SHORT_CIRCUIT_UNPROTECTED');
 
   return (
     <div className="circuit-sim">
+      <div className="mode-bar">
+        <div className="mode-bar__label">
+          {isPlaying ? 'وضع التشغيل: الدائرة شغالة، التصميم مقفول' : 'وضع التصميم: صمّم الدائرة بحرية، مفيش تيار لسه'}
+        </div>
+        <button type="button" className={isPlaying ? 'mode-bar__btn is-playing' : 'mode-bar__btn'} onClick={() => setMode(isPlaying ? 'edit' : 'play')}>
+          {isPlaying ? (
+            <>
+              <svg width={14} height={14} viewBox="0 0 14 14">
+                <rect x={3} y={3} width={3.4} height={8} fill="currentColor" />
+                <rect x={7.6} y={3} width={3.4} height={8} fill="currentColor" />
+              </svg>
+              إيقاف والتعديل
+            </>
+          ) : (
+            <>
+              <svg width={14} height={14} viewBox="0 0 14 14">
+                <path d="M3.5 2.5v9l8-4.5z" fill="currentColor" />
+              </svg>
+              تشغيل الدائرة
+            </>
+          )}
+        </button>
+      </div>
+
       {showUnprotectedShortWarning && (
         <div className="circuit-sim__banner">
           قصر مباشر بدون أي حماية! المفتاح ليس بديلاً عن القاطع - وصّل قاطعًا (MCB) أو فيوزًا لحماية الدائرة.
@@ -57,7 +91,8 @@ export function CircuitSimulator() {
             ref={svgRef}
             components={board.components}
             wires={board.wires}
-            result={board.result}
+            result={displayResult}
+            editable={!isPlaying}
             selectedId={board.selectedId}
             onSelect={board.setSelectedId}
             onMove={board.moveComponent}
@@ -89,14 +124,16 @@ export function CircuitSimulator() {
         <Inspector
           comp={selected}
           device={selectedDevice}
+          canOperate={isPlaying}
           onUpdate={board.updateComponent}
           onRemove={board.removeComponent}
           onReset={board.resetDevice}
           onToggleSwitch={board.toggleSwitch}
+          onToggleMcbClosed={board.toggleMcbClosed}
         />
       </div>
 
-      <ComponentPalette svgRef={svgRef} onDropComponent={board.addComponent} />
+      {!isPlaying && <ComponentPalette svgRef={svgRef} onDropComponent={board.addComponent} />}
     </div>
   );
 }

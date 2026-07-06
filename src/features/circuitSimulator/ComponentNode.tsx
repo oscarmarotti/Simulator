@@ -9,13 +9,14 @@ import { MotorSymbol } from './components/MotorSymbol';
 import { RelaySymbol } from './components/RelaySymbol';
 import { SourceSymbol } from './components/SourceSymbol';
 import { SwitchSymbol } from './components/SwitchSymbol';
+import { LINE_COLORS, METAL_STROKE, NEUTRAL_COLOR } from './theme';
 
 const MOVE_THRESHOLD = 6;
 
 function terminalColor(name: string): string {
-  if (name === 'N') return '#60a5fa';
-  if (name.startsWith('L')) return '#f87171';
-  return '#facc15';
+  if (name === 'N') return NEUTRAL_COLOR;
+  if (name.startsWith('L')) return LINE_COLORS[0];
+  return METAL_STROKE;
 }
 
 export function ComponentNode({
