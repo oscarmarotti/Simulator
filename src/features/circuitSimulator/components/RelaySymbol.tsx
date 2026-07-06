@@ -1,16 +1,23 @@
 import type { RelayComponent } from '../../../engine/types';
 import { INDICATOR_GREEN, LABEL_MUTED, METAL, METAL_STROKE, PLASTIC_DARK, PLASTIC_DARK_STROKE } from '../theme';
 
+/** Ice-cube relay silhouette: a domed (half-ellipse) top fused into straight
+ * sides - distinct from every other component's flat-rectangle or
+ * rounded-corner-only housing. */
+function domeTopPath(x: number, y: number, w: number, h: number, domeHeight: number): string {
+  return `M ${x} ${y + h} L ${x} ${y + domeHeight} A ${w / 2} ${domeHeight} 0 0 1 ${x + w} ${y + domeHeight} L ${x + w} ${y + h} Z`;
+}
+
 export function RelaySymbol({ comp, coilEnergized }: { comp: RelayComponent; coilEnergized: boolean }) {
   const closed = comp.contactClosed;
   return (
     <g>
-      {/* Base socket */}
+      {/* Base mounting plate */}
       <rect x={6} y={0} width={138} height={98} fill="#3a3f47" stroke={PLASTIC_DARK_STROKE} strokeWidth={1} />
-      {/* Translucent housing with visible internals */}
-      <rect x={10} y={4} width={130} height={90} fill={PLASTIC_DARK} stroke="#0e1013" strokeWidth={1.5} />
-      <rect x={16} y={10} width={118} height={78} fill="#171a1e" stroke="#000" strokeWidth={0.5} opacity={0.6} />
-      <line x1={75} y1={12} x2={75} y2={86} stroke="#3a3f47" strokeWidth={1} strokeDasharray="2 3" />
+      {/* Domed housing with a translucent domed viewing window over the internals */}
+      <path d={domeTopPath(10, 4, 130, 90, 34)} fill={PLASTIC_DARK} stroke="#0e1013" strokeWidth={1.5} />
+      <path d={domeTopPath(16, 10, 118, 78, 30)} fill="#171a1e" stroke="#000" strokeWidth={0.5} opacity={0.6} />
+      <line x1={75} y1={16} x2={75} y2={86} stroke="#3a3f47" strokeWidth={1} strokeDasharray="2 3" />
 
       <line x1={0} y1={24} x2={26} y2={24} stroke="#7d828a" strokeWidth={3} />
       <line x1={0} y1={76} x2={26} y2={76} stroke="#7d828a" strokeWidth={3} />

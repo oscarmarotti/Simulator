@@ -19,11 +19,11 @@ export interface ComponentVisual {
 // on phase mode / pole count.
 const STATIC_VISUALS = {
   switch: {
-    width: 80,
-    height: 70,
+    width: 84,
+    height: 84,
     terminals: {
-      in: { x: 0, y: 35 },
-      out: { x: 80, y: 35 },
+      in: { x: 0, y: 42 },
+      out: { x: 84, y: 42 },
     },
   },
   fuse: {

@@ -11,10 +11,18 @@ import {
   PLASTIC_DARK_STROKE,
 } from '../theme';
 
+/** Chamfered control-panel chassis: square on the terminal (left) edge, cut
+ * corners on the right where the readout/switch sit - a stepped industrial
+ * enclosure silhouette rather than a plain rectangle. */
+function chamferedChassisPath(w: number, h: number, c: number): string {
+  return `M 0 0 L ${w - c} 0 L ${w} ${c} L ${w} ${h - c} L ${w - c} ${h} L 0 ${h} Z`;
+}
+
 export function SourceSymbol({ comp }: { comp: SourceComponent }) {
   const isThree = comp.phase === 'three';
   const bodyW = isThree ? 130 : 100;
   const bodyH = isThree ? 168 : 80;
+  const chamfer = isThree ? 14 : 11;
   const panelX = isThree ? 34 : 30;
   const panelW = bodyW - panelX - 8;
   const panelY = 8;
@@ -26,12 +34,18 @@ export function SourceSymbol({ comp }: { comp: SourceComponent }) {
   const lineTerminals = isThree ? ['L1', 'L2', 'L3'] : ['L'];
   const lineYs = isThree ? [24, 56, 88] : [26];
   const neutralY = isThree ? 120 : 54;
+  const clipId = `source-chassis-${comp.id}`;
 
   return (
     <g>
-      {/* Enclosure: dark control-panel unit */}
-      <rect x={0} y={0} width={bodyW} height={bodyH} fill={PLASTIC_DARK} stroke={PLASTIC_DARK_STROKE} strokeWidth={2} />
-      <rect x={0} y={0} width={bodyW} height={7} fill={PLASTIC_DARK_HI} opacity={0.5} />
+      {/* Enclosure: dark control-panel unit with a chamfered chassis outline */}
+      <defs>
+        <clipPath id={clipId}>
+          <path d={chamferedChassisPath(bodyW, bodyH, chamfer)} />
+        </clipPath>
+      </defs>
+      <path d={chamferedChassisPath(bodyW, bodyH, chamfer)} fill={PLASTIC_DARK} stroke={PLASTIC_DARK_STROKE} strokeWidth={2} />
+      <rect x={0} y={0} width={bodyW} height={7} fill={PLASTIC_DARK_HI} opacity={0.5} clipPath={`url(#${clipId})`} />
       <text x={bodyW / 2} y={bodyH - 4} textAnchor="middle" fontSize={6} fontWeight={700} fill={LABEL_MUTED}>
         {isThree ? '3~ AC SUPPLY 50Hz' : '1~ AC SUPPLY 50Hz'}
       </text>

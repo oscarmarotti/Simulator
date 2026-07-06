@@ -8,26 +8,27 @@ export function FuseSymbol({ comp }: { comp: FuseComponent }) {
       <line x1={81} y1={30} x2={90} y2={30} stroke="#7d828a" strokeWidth={3.5} />
 
       {/* Fuse holder base (grey plastic mount) */}
-      <rect x={16} y={20} width={58} height={20} fill="#c3c7ce" stroke="#8b909a" strokeWidth={1} />
+      <rect x={16} y={20} width={58} height={20} rx={3} fill="#c3c7ce" stroke="#8b909a" strokeWidth={1} />
 
-      {/* Metal ferrules (end caps) */}
-      <rect x={9} y={13} width={13} height={34} fill={METAL} stroke={METAL_STROKE} strokeWidth={1} />
-      <rect x={68} y={13} width={13} height={34} fill={METAL} stroke={METAL_STROKE} strokeWidth={1} />
-      <rect x={11} y={16} width={3} height={28} fill="#dfe2e6" opacity={0.6} />
-      <rect x={70} y={16} width={3} height={28} fill="#dfe2e6" opacity={0.6} />
+      {/* Metal ferrules (rounded end caps) - a cartridge-fuse capsule, not a flat rectangle */}
+      <rect x={9} y={13} width={16} height={34} rx={6} fill={METAL} stroke={METAL_STROKE} strokeWidth={1} />
+      <rect x={65} y={13} width={16} height={34} rx={6} fill={METAL} stroke={METAL_STROKE} strokeWidth={1} />
+      <rect x={11} y={16} width={3} height={28} rx={1.5} fill="#dfe2e6" opacity={0.6} />
+      <rect x={70} y={16} width={3} height={28} rx={1.5} fill="#dfe2e6" opacity={0.6} />
 
-      {/* Ceramic / glass tube */}
+      {/* Ceramic / glass capsule tube */}
       <rect
         x={20}
         y={13}
         width={50}
         height={34}
+        rx={17}
         fill={comp.blown ? '#332c28' : '#e7e2d3'}
         stroke="#8b8570"
         strokeWidth={1.5}
         opacity={comp.blown ? 0.9 : 0.85}
       />
-      <rect x={24} y={16} width={6} height={26} fill="#ffffff" opacity={comp.blown ? 0.03 : 0.3} />
+      <rect x={24} y={16} width={6} height={26} rx={3} fill="#ffffff" opacity={comp.blown ? 0.03 : 0.3} />
 
       {comp.blown ? (
         <g>

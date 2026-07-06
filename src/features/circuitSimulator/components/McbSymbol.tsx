@@ -16,6 +16,11 @@ import {
 
 const POLE_WIDTH = 42;
 
+/** Rounded top corners only, square bottom - the classic DIN-breaker silhouette. */
+function roundedTopPath(x: number, y: number, w: number, h: number, r: number): string {
+  return `M ${x} ${y + h} L ${x} ${y + r} Q ${x} ${y} ${x + r} ${y} L ${x + w - r} ${y} Q ${x + w} ${y} ${x + w} ${y + r} L ${x + w} ${y + h} Z`;
+}
+
 export function McbSymbol({ comp, current }: { comp: McbComponent; current: number }) {
   const on = comp.closed && !comp.tripped;
   const overCurrent = on && current > comp.rating * 0.85;
@@ -27,8 +32,13 @@ export function McbSymbol({ comp, current }: { comp: McbComponent; current: numb
 
   return (
     <g>
-      {/* DIN rail clip */}
-      <rect x={width / 2 - 13} y={92} width={26} height={5} fill={METAL} stroke={METAL_STROKE} strokeWidth={0.75} />
+      {/* DIN rail clip: a distinct hook/tooth shape, not just a rectangle */}
+      <path
+        d={`M ${width / 2 - 12} 87 L ${width / 2 - 12} 92 Q ${width / 2} 97 ${width / 2 + 12} 92 L ${width / 2 + 12} 87 Z`}
+        fill={METAL}
+        stroke={METAL_STROKE}
+        strokeWidth={0.9}
+      />
 
       {/* Terminal screws + lead stubs, one pair per pole */}
       {Array.from({ length: comp.poles }).map((_, i) => {
@@ -36,7 +46,7 @@ export function McbSymbol({ comp, current }: { comp: McbComponent; current: numb
         return (
           <g key={i}>
             <line x1={x} y1={0} x2={x} y2={9} stroke="#7d828a" strokeWidth={3.5} />
-            <line x1={x} y1={87} x2={x} y2={96} stroke="#7d828a" strokeWidth={3.5} />
+            <line x1={x} y1={87} x2={x} y2={92} stroke="#7d828a" strokeWidth={3.5} />
             <circle cx={x} cy={11} r={3} fill={METAL} stroke={METAL_STROKE} strokeWidth={1} />
             <line x1={x - 2} y1={11} x2={x + 2} y2={11} stroke={METAL_STROKE} strokeWidth={0.8} />
             <circle cx={x} cy={85} r={3} fill={METAL} stroke={METAL_STROKE} strokeWidth={1} />
@@ -45,9 +55,14 @@ export function McbSymbol({ comp, current }: { comp: McbComponent; current: numb
         );
       })}
 
-      {/* Plastic body */}
-      <rect x={4} y={9} width={width - 8} height={78} rx={2} fill={PLASTIC_LIGHT} stroke={PLASTIC_LIGHT_STROKE} strokeWidth={1.5} />
-      <rect x={4} y={9} width={width - 8} height={10} rx={2} fill={PLASTIC_LIGHT_HI} opacity={0.6} />
+      {/* Plastic body - rounded top, square bottom (rail-mount silhouette) */}
+      <path
+        d={roundedTopPath(4, 9, width - 8, 78, 8)}
+        fill={PLASTIC_LIGHT}
+        stroke={PLASTIC_LIGHT_STROKE}
+        strokeWidth={1.5}
+      />
+      <path d={roundedTopPath(4, 9, width - 8, 12, 8)} fill={PLASTIC_LIGHT_HI} opacity={0.6} />
       {Array.from({ length: comp.poles - 1 }).map((_, i) => (
         <line
           key={i}
@@ -62,24 +77,21 @@ export function McbSymbol({ comp, current }: { comp: McbComponent; current: numb
       ))}
 
       {/* Nameplate: rating / curve */}
-      <rect x={7} y={13} width={width - 14} height={17} fill={PLASTIC_LIGHT_PANEL} />
-      <text x={width / 2} y={25.5} textAnchor="middle" fontSize={10} fontWeight={700} fill={LABEL_DARK} fontFamily="Arial, sans-serif">
+      <rect x={7} y={16} width={width - 14} height={17} fill={PLASTIC_LIGHT_PANEL} />
+      <text x={width / 2} y={28.5} textAnchor="middle" fontSize={10} fontWeight={700} fill={LABEL_DARK} fontFamily="Arial, sans-serif">
         {comp.rating}A {comp.poles}P
       </text>
-      <text x={width / 2} y={38} textAnchor="middle" fontSize={7.5} fontWeight={600} fill={LABEL_MUTED}>
+      <text x={width / 2} y={41} textAnchor="middle" fontSize={7.5} fontWeight={600} fill={LABEL_MUTED}>
         CURVE {comp.curve} · IEC60898
       </text>
 
-      {/* Trip/status indicator window */}
-      <rect x={width - 18} y={13} width={8} height={10} fill="#0f1113" stroke={METAL_STROKE} strokeWidth={0.75} />
-      <rect x={width - 17} y={14} width={6} height={8} fill={flagColor} />
+      {/* Trip/status indicator window - round, not a plain rectangle */}
+      <circle cx={width - 14} cy={22} r={5.5} fill="#0f1113" stroke={METAL_STROKE} strokeWidth={0.75} />
+      <circle cx={width - 14} cy={22} r={3.8} fill={flagColor} />
 
-      {/* Handle housing + shared lever (mechanically common across all poles) */}
-      <rect
-        x={leverCx - leverW / 2 - 3}
-        y={46}
-        width={leverW + 6}
-        height={38}
+      {/* Handle housing: a stepped, narrower raised block (real breakers recess the toggle) */}
+      <path
+        d={roundedTopPath(leverCx - leverW / 2 - 3, 46, leverW + 6, 38, 5)}
         fill={PLASTIC_DARK}
         stroke="#14171b"
         strokeWidth={1}
@@ -95,12 +107,13 @@ export function McbSymbol({ comp, current }: { comp: McbComponent; current: numb
         y={leverY}
         width={leverW}
         height={22}
+        rx={3}
         fill={comp.tripped ? '#8a3030' : '#1b1d20'}
         stroke="#000000"
         strokeWidth={0.75}
         style={{ transition: 'y 140ms ease' }}
       />
-      <rect x={leverCx - leverW / 2 + 2} y={leverY + 2} width={leverW - 4} height={3} fill="#4a4f57" opacity={0.7} />
+      <rect x={leverCx - leverW / 2 + 2} y={leverY + 2} width={leverW - 4} height={3} rx={1.5} fill="#4a4f57" opacity={0.7} />
 
       {overCurrent && (
         <circle cx={width - 14} cy={45} r={3}>
@@ -108,7 +121,7 @@ export function McbSymbol({ comp, current }: { comp: McbComponent; current: numb
         </circle>
       )}
       {comp.tripped && (
-        <text x={width / 2} y={92} textAnchor="middle" fontSize={7} fontWeight={700} fill={INDICATOR_RED}>
+        <text x={width / 2} y={-6} textAnchor="middle" fontSize={7} fontWeight={700} fill={INDICATOR_RED}>
           فصل - إعادة ضبط
         </text>
       )}

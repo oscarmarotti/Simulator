@@ -113,6 +113,14 @@
     flex-shrink: 0;
     border-top: 1px solid var(--border);
   }
+  /* Selecting/deselecting a component is a discrete tap, not a mid-gesture
+     event, so it's fine for this one to differ: an empty inspector has
+     nothing to show and shouldn't permanently starve the canvas of most of
+     the screen on short phones. */
+  .inspector.inspector--empty {
+    height: auto;
+    min-height: 56px;
+  }
 }
 
 .inspector__hint {

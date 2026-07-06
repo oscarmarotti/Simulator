@@ -20,7 +20,7 @@ interface Props {
 export function Inspector({ comp, device, canOperate, onUpdate, onRemove, onReset, onToggleSwitch, onToggleMcbClosed }: Props) {
   if (!comp) {
     return (
-      <div className="inspector card">
+      <div className="inspector inspector--empty card">
         <p className="inspector__hint">اختر مكونًا من اللوحة لعرض إعداداته، أو اسحب قطعة جديدة من القائمة أسفل الشاشة.</p>
       </div>
     );
