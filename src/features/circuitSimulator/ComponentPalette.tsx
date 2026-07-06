@@ -1,13 +1,5 @@
 import { useState } from 'react';
-import {
-  makeFuse,
-  makeLamp,
-  makeMcb,
-  makeMotor,
-  makeRelay,
-  makeSource,
-  makeSwitch,
-} from '../../engine/factory';
+import { makeDefaultComponent } from '../../engine/factory';
 import type { ComponentType } from '../../engine/types';
 import { PALETTE_ITEMS } from './boardTypes';
 import { FuseSymbol } from './components/FuseSymbol';
@@ -17,7 +9,7 @@ import { MotorSymbol } from './components/MotorSymbol';
 import { RelaySymbol } from './components/RelaySymbol';
 import { SourceSymbol } from './components/SourceSymbol';
 import { SwitchSymbol } from './components/SwitchSymbol';
-import { COMPONENT_VISUALS } from './layout';
+import { getComponentVisual } from './layout';
 import { clientToSvgPoint } from './svgCoords';
 
 interface Props {
@@ -44,7 +36,7 @@ export function ComponentPalette({ svgRef, onDropComponent }: Props) {
     const elAtPoint = document.elementFromPoint(e.clientX, e.clientY);
     if (!elAtPoint || !svg.contains(elAtPoint)) return;
     const p = clientToSvgPoint(svg, e.clientX, e.clientY);
-    const visual = COMPONENT_VISUALS[type];
+    const visual = getComponentVisual(makeDefaultComponent(type, 'preview'));
     onDropComponent(type, p.x - visual.width / 2, p.y - visual.height / 2);
   };
 
@@ -79,34 +71,35 @@ export function ComponentPalette({ svgRef, onDropComponent }: Props) {
 }
 
 function PaletteIcon({ type }: { type: ComponentType }) {
-  const visual = COMPONENT_VISUALS[type];
+  const comp = makeDefaultComponent(type, 'preview');
+  const visual = getComponentVisual(comp);
   const scale = 36 / Math.max(visual.width, visual.height);
   return (
     <svg width={44} height={44} viewBox="0 0 44 44">
       <g
         transform={`translate(${22 - (visual.width * scale) / 2}, ${22 - (visual.height * scale) / 2}) scale(${scale})`}
       >
-        <PaletteSymbol type={type} />
+        <PaletteSymbol comp={comp} />
       </g>
     </svg>
   );
 }
 
-function PaletteSymbol({ type }: { type: ComponentType }) {
-  switch (type) {
+function PaletteSymbol({ comp }: { comp: ReturnType<typeof makeDefaultComponent> }) {
+  switch (comp.type) {
     case 'source':
-      return <SourceSymbol comp={makeSource('preview', 220)} />;
+      return <SourceSymbol comp={comp} />;
     case 'mcb':
-      return <McbSymbol comp={makeMcb('preview', 16, 'C')} current={0} />;
+      return <McbSymbol comp={comp} current={0} />;
     case 'switch':
-      return <SwitchSymbol comp={makeSwitch('preview', true)} />;
+      return <SwitchSymbol comp={comp} />;
     case 'fuse':
-      return <FuseSymbol comp={makeFuse('preview', 10)} />;
+      return <FuseSymbol comp={comp} />;
     case 'relay':
-      return <RelaySymbol comp={makeRelay('preview', 220, 3)} coilEnergized={false} />;
+      return <RelaySymbol comp={comp} coilEnergized={false} />;
     case 'lamp':
-      return <LampSymbol comp={makeLamp('preview', 100, 220, '#ffd76a')} powerW={100} />;
+      return <LampSymbol comp={comp} powerW={100} />;
     case 'motor':
-      return <MotorSymbol comp={makeMotor('preview', 0.5, 220)} voltageAcross={220} current={2} />;
+      return <MotorSymbol comp={comp} voltageAcross={220} current={2} />;
   }
 }

@@ -1,36 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { solveCircuit } from '../../engine/circuitEngine';
-import {
-  makeFuse,
-  makeLamp,
-  makeMcb,
-  makeMotor,
-  makeRelay,
-  makeSource,
-  makeSwitch,
-  nextId,
-} from '../../engine/factory';
-import type { CircuitComponent, ComponentType, TerminalRef, Wire } from '../../engine/types';
+import { makeDefaultComponent, nextId } from '../../engine/factory';
+import type { ComponentType, TerminalRef, Wire } from '../../engine/types';
 import type { PlacedComponent } from './boardTypes';
-
-function makeDefault(type: ComponentType, id: string): CircuitComponent {
-  switch (type) {
-    case 'source':
-      return makeSource(id, 220);
-    case 'mcb':
-      return makeMcb(id, 16, 'C');
-    case 'switch':
-      return makeSwitch(id, true);
-    case 'fuse':
-      return makeFuse(id, 10);
-    case 'relay':
-      return makeRelay(id, 220, 3);
-    case 'lamp':
-      return makeLamp(id, 100, 220, '#ffd76a');
-    case 'motor':
-      return makeMotor(id, 0.5, 220);
-  }
-}
 
 export function useCircuitBoard() {
   const [components, setComponents] = useState<PlacedComponent[]>([]);
@@ -39,7 +11,7 @@ export function useCircuitBoard() {
 
   const addComponent = useCallback((type: ComponentType, x: number, y: number) => {
     const id = nextId(type);
-    const base = makeDefault(type, id);
+    const base = makeDefaultComponent(type, id);
     const placed: PlacedComponent = { ...base, x, y } as PlacedComponent;
     setComponents((prev) => [...prev, placed]);
     setSelectedId(id);

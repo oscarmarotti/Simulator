@@ -13,7 +13,7 @@ export function tidRef(ref: TerminalRef): string {
 export interface EdgeSpec {
   key: string;
   componentId: string;
-  edgeName: 'main' | 'coil' | 'contact';
+  edgeName: string;
   t1: string;
   t2: string;
   r: number;
@@ -37,20 +37,41 @@ export function getEdgeSpecs(c: CircuitComponent): EdgeSpec[] {
   switch (c.type) {
     case 'source':
       return [];
-    case 'mcb':
-      return [
-        {
-          key: c.id,
+    case 'mcb': {
+      // Multiple poles trip together (common trip mechanism): the tripped
+      // flag is shared, but each pole is its own edge so its own current can
+      // be read out (a 3-phase breaker trips if ANY single pole overloads).
+      if (c.poles === 1) {
+        return [
+          {
+            key: c.id,
+            componentId: c.id,
+            edgeName: 'main',
+            t1: tid(c.id, 'in'),
+            t2: tid(c.id, 'out'),
+            r: c.tripped ? R_OFF : R_ON,
+            isLoad: false,
+            isProtector: true,
+            conductive: !c.tripped,
+          },
+        ];
+      }
+      const edges: EdgeSpec[] = [];
+      for (let i = 1; i <= c.poles; i++) {
+        edges.push({
+          key: `${c.id}:pole${i}`,
           componentId: c.id,
-          edgeName: 'main',
-          t1: tid(c.id, 'in'),
-          t2: tid(c.id, 'out'),
+          edgeName: `pole${i}`,
+          t1: tid(c.id, `in${i}`),
+          t2: tid(c.id, `out${i}`),
           r: c.tripped ? R_OFF : R_ON,
           isLoad: false,
           isProtector: true,
           conductive: !c.tripped,
-        },
-      ];
+        });
+      }
+      return edges;
+    }
     case 'switch':
       return [
         {
@@ -137,6 +158,11 @@ export function getEdgeSpecs(c: CircuitComponent): EdgeSpec[] {
 
 export function allEdgeSpecs(components: CircuitComponent[]): EdgeSpec[] {
   return components.flatMap(getEdgeSpecs);
+}
+
+/** Edge keys for a single component's poles/edges (e.g. an mcb's per-pole readings). */
+export function edgeKeysForComponent(c: CircuitComponent): string[] {
+  return getEdgeSpecs(c).map((e) => e.key);
 }
 
 /** Merges only user-drawn wires: defines true electrical node identity. */

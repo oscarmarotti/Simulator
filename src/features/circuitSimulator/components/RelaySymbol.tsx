@@ -4,7 +4,9 @@ export function RelaySymbol({ comp, coilEnergized }: { comp: RelayComponent; coi
   const closed = comp.contactClosed;
   return (
     <g>
+      <rect x={8} y={2} width={134} height={96} rx={12} fill="#0f172a" stroke="#334155" strokeWidth={1} />
       <rect x={10} y={4} width={130} height={92} rx={10} fill="#1e293b" stroke="#475569" strokeWidth={2} />
+      <line x1={75} y1={10} x2={75} y2={90} stroke="#334155" strokeWidth={1} strokeDasharray="2 4" />
 
       <line x1={0} y1={24} x2={26} y2={24} stroke="#9ca3af" strokeWidth={3} />
       <line x1={0} y1={76} x2={26} y2={76} stroke="#9ca3af" strokeWidth={3} />

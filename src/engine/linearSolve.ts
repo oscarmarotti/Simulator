@@ -35,3 +35,19 @@ export function solveLinearSystem(A: number[][], b: number[]): number[] {
   }
   return x;
 }
+
+/**
+ * Solves A x = b for a complex right-hand side, where A (conductances) is
+ * purely real - true whenever every branch is resistive. Real and imaginary
+ * parts decouple into two independent real solves of the same matrix, which
+ * is what lets a 3-phase source's 120-degree-apart voltage phasors produce
+ * correct line-to-line (sqrt(3) x line-to-neutral) magnitudes without a full
+ * complex Gaussian elimination.
+ */
+export function solveComplexLinearSystem(
+  A: number[][],
+  bRe: number[],
+  bIm: number[],
+): { re: number[]; im: number[] } {
+  return { re: solveLinearSystem(A, bRe), im: solveLinearSystem(A, bIm) };
+}

@@ -10,7 +10,10 @@ export function LampSymbol({ comp, powerW }: { comp: LampComponent; powerW: numb
       <line x1={52} y1={84} x2={80} y2={88} stroke="#9ca3af" strokeWidth={3} />
 
       {!comp.burnedOut && brightness > 0.02 && (
-        <circle cx={40} cy={38} r={glowRadius} fill={comp.color} opacity={0.18 + brightness * 0.35} />
+        <>
+          <circle cx={40} cy={38} r={glowRadius + 10} fill={comp.color} opacity={0.08 + brightness * 0.18} />
+          <circle cx={40} cy={38} r={glowRadius} fill={comp.color} opacity={0.18 + brightness * 0.35} />
+        </>
       )}
 
       <circle
@@ -22,6 +25,7 @@ export function LampSymbol({ comp, powerW }: { comp: LampComponent; powerW: numb
         stroke="#94a3b8"
         strokeWidth={1.5}
       />
+      <ellipse cx={30} cy={26} rx={7} ry={11} fill="#ffffff" opacity={0.18} />
 
       {comp.burnedOut ? (
         <g>
@@ -40,8 +44,9 @@ export function LampSymbol({ comp, powerW }: { comp: LampComponent; powerW: numb
       )}
 
       <rect x={28} y={64} width={24} height={20} rx={2} fill="#94a3b8" stroke="#64748b" />
-      <line x1={28} y1={70} x2={52} y2={70} stroke="#64748b" strokeWidth={1.5} />
-      <line x1={28} y1={76} x2={52} y2={76} stroke="#64748b" strokeWidth={1.5} />
+      <line x1={28} y1={68} x2={52} y2={68} stroke="#64748b" strokeWidth={1.5} />
+      <line x1={28} y1={73} x2={52} y2={73} stroke="#64748b" strokeWidth={1.5} />
+      <line x1={28} y1={78} x2={52} y2={78} stroke="#64748b" strokeWidth={1.5} />
       <path d="M 30 84 Q 40 90 50 84" stroke="#64748b" strokeWidth={3} fill="none" />
 
       <text x={40} y={12} textAnchor="middle" fontSize={9} fontWeight={700} fill="#94a3b8">

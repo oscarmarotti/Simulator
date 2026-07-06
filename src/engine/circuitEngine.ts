@@ -1,7 +1,7 @@
-import { allEdgeSpecs, buildFlowUnionFind, buildStrictUnionFind, findProtectorsForLoad, tid, tidRef } from './graph';
+import { allEdgeSpecs, buildFlowUnionFind, buildStrictUnionFind, edgeKeysForComponent, findProtectorsForLoad, tid, tidRef } from './graph';
 import { solveOnce } from './solveOnce';
-import type { CircuitComponent, CircuitResult, DeviceResult, TripEvent, Wire } from './types';
-import { CURRENT_EPSILON, PICKUP_RATIO, UNPROTECTED_BURN_CURRENT_A } from './types';
+import type { CircuitComponent, CircuitResult, DeviceResult, SourceComponent, TripEvent, Wire } from './types';
+import { CURRENT_EPSILON, PICKUP_RATIO, sourceTerminalNames, UNPROTECTED_BURN_CURRENT_A } from './types';
 
 const MAX_ITERATIONS = 25;
 
@@ -9,24 +9,39 @@ function cloneComponents(components: CircuitComponent[]): CircuitComponent[] {
   return components.map((c) => ({ ...c }));
 }
 
+function sourceTerminalPairs(s: SourceComponent): Array<[string, string]> {
+  const names = sourceTerminalNames(s.phase);
+  const pairs: Array<[string, string]> = [];
+  for (let i = 0; i < names.length; i++) {
+    for (let j = i + 1; j < names.length; j++) pairs.push([names[i], names[j]]);
+  }
+  return pairs;
+}
+
 function isDeadShort(components: CircuitComponent[], wires: Wire[]): boolean {
   const strict = buildStrictUnionFind(components, wires);
   return components.some(
-    (c) => c.type === 'source' && strict.connected(tid(c.id, 'L'), tid(c.id, 'N')),
+    (c) =>
+      c.type === 'source' &&
+      c.on &&
+      sourceTerminalPairs(c).some(([a, b]) => strict.connected(tid(c.id, a), tid(c.id, b))),
   );
 }
 
 function motorIsDirectAcrossSource(
   strict: ReturnType<typeof buildStrictUnionFind>,
   motorId: string,
-  sources: CircuitComponent[],
+  sources: SourceComponent[],
 ): boolean {
   const a = strict.find(tid(motorId, 'in'));
   const b = strict.find(tid(motorId, 'out'));
   return sources.some((s) => {
-    const L = strict.find(tid(s.id, 'L'));
-    const N = strict.find(tid(s.id, 'N'));
-    return (a === L && b === N) || (a === N && b === L);
+    if (!s.on) return false;
+    return sourceTerminalPairs(s).some(([t1, t2]) => {
+      const n1 = strict.find(tid(s.id, t1));
+      const n2 = strict.find(tid(s.id, t2));
+      return (a === n1 && b === n2) || (a === n2 && b === n1);
+    });
   });
 }
 
@@ -37,7 +52,8 @@ function motorIsDirectAcrossSource(
  */
 export function solveCircuit(inputComponents: CircuitComponent[], wires: Wire[]): CircuitResult {
   const state = cloneComponents(inputComponents);
-  const sources = state.filter((c) => c.type === 'source');
+  const sources = state.filter((c): c is SourceComponent => c.type === 'source');
+  const sourceTerminalIds = sources.flatMap((s) => sourceTerminalNames(s.phase).map((t) => tid(s.id, t)));
   const warnings: string[] = [];
   const tripEvents = new Map<string, TripEvent>();
 
@@ -55,7 +71,9 @@ export function solveCircuit(inputComponents: CircuitComponent[], wires: Wire[])
   let result = solveOnce(state, wires);
   for (let iter = 0; iter < MAX_ITERATIONS; iter++) {
     const strict = buildStrictUnionFind(state, wires);
-    const deadShort = sources.some((s) => strict.connected(tid(s.id, 'L'), tid(s.id, 'N')));
+    const deadShort = sources.some(
+      (s) => s.on && sourceTerminalPairs(s).some(([a, b]) => strict.connected(tid(s.id, a), tid(s.id, b))),
+    );
 
     for (const c of state) {
       if (c.type === 'motor' && !c.burnedOut) {
@@ -68,8 +86,8 @@ export function solveCircuit(inputComponents: CircuitComponent[], wires: Wire[])
     let changed = false;
     for (const c of state) {
       if (c.type === 'mcb' && !c.tripped) {
-        const current = result.readings.get(c.id)?.current ?? 0;
-        if (current > c.rating) {
+        const maxCurrent = Math.max(0, ...edgeKeysForComponent(c).map((k) => result.readings.get(k)?.current ?? 0));
+        if (maxCurrent > c.rating) {
           c.tripped = true;
           changed = true;
           tripEvents.set(c.id, deadShort ? 'SHORT_CIRCUIT' : 'OVERLOAD');
@@ -90,13 +108,12 @@ export function solveCircuit(inputComponents: CircuitComponent[], wires: Wire[])
     }
 
     {
-      const sourceTerminals = sources.flatMap((s) => [tid(s.id, 'L'), tid(s.id, 'N')]);
       let burnChanged = false;
       for (const c of state) {
         if ((c.type === 'lamp' || c.type === 'motor') && !c.burnedOut) {
           const current = result.readings.get(c.id)?.current ?? 0;
           if (current > UNPROTECTED_BURN_CURRENT_A) {
-            const protectors = findProtectorsForLoad(state, wires, c.id, sourceTerminals);
+            const protectors = findProtectorsForLoad(state, wires, c.id, sourceTerminalIds);
             if (protectors.length === 0) {
               c.burnedOut = true;
               burnChanged = true;
@@ -118,11 +135,41 @@ export function solveCircuit(inputComponents: CircuitComponent[], wires: Wire[])
     warnings.push('SHORT_CIRCUIT_UNPROTECTED');
   }
 
-  const sourceTerminals = sources.flatMap((s) => [tid(s.id, 'L'), tid(s.id, 'N')]);
   const devices: Record<string, DeviceResult> = {};
 
   for (const c of state) {
     if (c.type === 'source') continue;
+
+    if (c.type === 'mcb' && c.poles > 1) {
+      // Report both a representative (worst-pole) entry under the component id,
+      // and a per-pole breakdown so the UI can show each line's own current.
+      const poleKeys = edgeKeysForComponent(c);
+      let worst = { current: 0, voltageAcross: 0 };
+      for (const k of poleKeys) {
+        const reading = result.readings.get(k) ?? { current: 0, voltageAcross: 0 };
+        devices[k] = {
+          id: k,
+          type: c.type,
+          current: reading.current,
+          voltageAcross: reading.voltageAcross,
+          powerW: reading.current * reading.voltageAcross,
+          tripEvent: tripEvents.get(c.id) ?? null,
+          protectedBy: [],
+        };
+        if (reading.current > worst.current) worst = reading;
+      }
+      devices[c.id] = {
+        id: c.id,
+        type: c.type,
+        current: worst.current,
+        voltageAcross: worst.voltageAcross,
+        powerW: worst.current * worst.voltageAcross,
+        tripEvent: tripEvents.get(c.id) ?? null,
+        protectedBy: [],
+      };
+      continue;
+    }
+
     const key = c.id;
     const reading = result.readings.get(key);
     const current = reading?.current ?? 0;
@@ -130,7 +177,7 @@ export function solveCircuit(inputComponents: CircuitComponent[], wires: Wire[])
 
     let protectedBy: string[] = [];
     if (c.type === 'lamp' || c.type === 'motor') {
-      protectedBy = findProtectorsForLoad(state, wires, c.id, sourceTerminals);
+      protectedBy = findProtectorsForLoad(state, wires, c.id, sourceTerminalIds);
     }
 
     devices[key] = {

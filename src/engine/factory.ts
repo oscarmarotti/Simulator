@@ -1,9 +1,12 @@
 import type {
   CircuitComponent,
+  ComponentType,
   FuseComponent,
   LampComponent,
   McbComponent,
   MotorComponent,
+  PhaseMode,
+  PoleCount,
   RelayComponent,
   SourceComponent,
   SwitchComponent,
@@ -15,12 +18,17 @@ export function nextId(prefix: string): string {
   return `${prefix}_${counter}`;
 }
 
-export function makeSource(id: string, voltage = 220): SourceComponent {
-  return { id, type: 'source', voltage };
+export function makeSource(id: string, voltage = 220, phase: PhaseMode = 'single'): SourceComponent {
+  return { id, type: 'source', voltage, phase, on: true };
 }
 
-export function makeMcb(id: string, rating = 16, curve: McbComponent['curve'] = 'C'): McbComponent {
-  return { id, type: 'mcb', rating, curve, tripped: false };
+export function makeMcb(
+  id: string,
+  rating = 16,
+  curve: McbComponent['curve'] = 'C',
+  poles: PoleCount = 1,
+): McbComponent {
+  return { id, type: 'mcb', rating, curve, poles, tripped: false };
 }
 
 export function makeSwitch(id: string, on = true): SwitchComponent {
@@ -45,6 +53,25 @@ export function makeLamp(id: string, ratedPowerW = 100, ratedVoltage = 220, colo
 
 export function makeMotor(id: string, ratedHp = 0.5, ratedVoltage = 220): MotorComponent {
   return { id, type: 'motor', ratedHp, ratedVoltage, burnedOut: false, stalled: false };
+}
+
+export function makeDefaultComponent(type: ComponentType, id: string): CircuitComponent {
+  switch (type) {
+    case 'source':
+      return makeSource(id, 220);
+    case 'mcb':
+      return makeMcb(id, 16, 'C');
+    case 'switch':
+      return makeSwitch(id, true);
+    case 'fuse':
+      return makeFuse(id, 10);
+    case 'relay':
+      return makeRelay(id, 220, 3);
+    case 'lamp':
+      return makeLamp(id, 100, 220, '#ffd76a');
+    case 'motor':
+      return makeMotor(id, 0.5, 220);
+  }
 }
 
 export type { CircuitComponent };

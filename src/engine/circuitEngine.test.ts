@@ -279,4 +279,92 @@ describe('solveCircuit', () => {
     expect(updatedRelay && 'contactClosed' in updatedRelay && updatedRelay.contactClosed).toBe(false);
     expect(result.devices['lamp1'].current).toBeCloseTo(0, 5);
   });
+
+  it('3-phase source: a lamp wired line-to-neutral sees the phase voltage (220V)', () => {
+    const source = makeSource('src', 220, 'three');
+    const lamp = makeLamp('lamp1', 100, 220);
+    const components: CircuitComponent[] = [source, lamp];
+    const wires: Wire[] = [
+      wire('w1', 'src', 'L1', 'lamp1', 'in'),
+      wire('w2', 'lamp1', 'out', 'src', 'N'),
+    ];
+
+    const result = solveCircuit(components, wires);
+    expect(result.devices['lamp1'].voltageAcross).toBeCloseTo(220, 0);
+  });
+
+  it('3-phase source: a load wired line-to-line sees sqrt(3) x phase voltage (~380V)', () => {
+    const source = makeSource('src', 220, 'three');
+    const lamp = makeLamp('lamp1', 100, 220);
+    const components: CircuitComponent[] = [source, lamp];
+    const wires: Wire[] = [
+      wire('w1', 'src', 'L1', 'lamp1', 'in'),
+      wire('w2', 'lamp1', 'out', 'src', 'L2'),
+    ];
+
+    const result = solveCircuit(components, wires);
+    expect(result.devices['lamp1'].voltageAcross).toBeCloseTo(220 * Math.sqrt(3), 0);
+  });
+
+  it('3-phase source: the three line-to-neutral pairs are all independently live in parallel', () => {
+    const source = makeSource('src', 220, 'three');
+    const lamp1 = makeLamp('lamp1', 100, 220);
+    const lamp2 = makeLamp('lamp2', 100, 220);
+    const lamp3 = makeLamp('lamp3', 100, 220);
+    const components: CircuitComponent[] = [source, lamp1, lamp2, lamp3];
+    const wires: Wire[] = [
+      wire('w1', 'src', 'L1', 'lamp1', 'in'),
+      wire('w2', 'lamp1', 'out', 'src', 'N'),
+      wire('w3', 'src', 'L2', 'lamp2', 'in'),
+      wire('w4', 'lamp2', 'out', 'src', 'N'),
+      wire('w5', 'src', 'L3', 'lamp3', 'in'),
+      wire('w6', 'lamp3', 'out', 'src', 'N'),
+    ];
+
+    const result = solveCircuit(components, wires);
+    expect(result.devices['lamp1'].voltageAcross).toBeCloseTo(220, 0);
+    expect(result.devices['lamp2'].voltageAcross).toBeCloseTo(220, 0);
+    expect(result.devices['lamp3'].voltageAcross).toBeCloseTo(220, 0);
+  });
+
+  it('a 3-pole breaker trips ALL poles together when only one pole overloads', () => {
+    const source = makeSource('src', 220, 'three');
+    const mcb = makeMcb('mcb1', 6, 'C', 3); // 6A per pole, 3 poles
+    const lampOverload = makeLamp('lampOver', 2000, 220); // ~9A on L1, over the 6A rating
+    const lamp2 = makeLamp('lamp2', 100, 220); // ~0.45A on L2, well under rating alone
+    const lamp3 = makeLamp('lamp3', 100, 220); // ~0.45A on L3
+    const components: CircuitComponent[] = [source, mcb, lampOverload, lamp2, lamp3];
+    const wires: Wire[] = [
+      wire('w1', 'src', 'L1', 'mcb1', 'in1'),
+      wire('w2', 'mcb1', 'out1', 'lampOver', 'in'),
+      wire('w3', 'lampOver', 'out', 'src', 'N'),
+      wire('w4', 'src', 'L2', 'mcb1', 'in2'),
+      wire('w5', 'mcb1', 'out2', 'lamp2', 'in'),
+      wire('w6', 'lamp2', 'out', 'src', 'N'),
+      wire('w7', 'src', 'L3', 'mcb1', 'in3'),
+      wire('w8', 'mcb1', 'out3', 'lamp3', 'in'),
+      wire('w9', 'lamp3', 'out', 'src', 'N'),
+    ];
+
+    const result = solveCircuit(components, wires);
+    const updatedMcb = result.components.find((c) => c.id === 'mcb1');
+    expect(updatedMcb && 'tripped' in updatedMcb && updatedMcb.tripped).toBe(true);
+    // Common trip: even the healthy L2/L3 poles are cut off once the breaker trips.
+    expect(result.devices['lamp2'].current).toBeCloseTo(0, 5);
+    expect(result.devices['lamp3'].current).toBeCloseTo(0, 5);
+  });
+
+  it('turning a source off de-energises everything downstream', () => {
+    const source = makeSource('src', 220);
+    const lamp = makeLamp('lamp1', 100, 220);
+    const components: CircuitComponent[] = [{ ...source, on: false }, lamp];
+    const wires: Wire[] = [
+      wire('w1', 'src', 'L', 'lamp1', 'in'),
+      wire('w2', 'lamp1', 'out', 'src', 'N'),
+    ];
+
+    const result = solveCircuit(components, wires);
+    expect(result.devices['lamp1'].current).toBeCloseTo(0, 5);
+    expect(result.devices['lamp1'].voltageAcross).toBeCloseTo(0, 5);
+  });
 });

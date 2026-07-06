@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import type { DeviceResult } from '../../engine/types';
 import type { PlacedComponent } from './boardTypes';
-import { COMPONENT_VISUALS } from './layout';
+import { getComponentVisual } from './layout';
 import { FuseSymbol } from './components/FuseSymbol';
 import { LampSymbol } from './components/LampSymbol';
 import { McbSymbol } from './components/McbSymbol';
@@ -12,11 +12,18 @@ import { SwitchSymbol } from './components/SwitchSymbol';
 
 const MOVE_THRESHOLD = 6;
 
+function terminalColor(name: string): string {
+  if (name === 'N') return '#60a5fa';
+  if (name.startsWith('L')) return '#f87171';
+  return '#facc15';
+}
+
 export function ComponentNode({
   comp,
   device,
   coilDevice,
   selected,
+  isTerminalHighlighted,
   onBodyPointerDown,
   onTerminalPointerDown,
   onTap,
@@ -25,11 +32,12 @@ export function ComponentNode({
   device?: DeviceResult;
   coilDevice?: DeviceResult;
   selected: boolean;
+  isTerminalHighlighted: (componentId: string, terminal: string) => boolean;
   onBodyPointerDown: (e: React.PointerEvent<SVGGElement>, id: string) => void;
   onTerminalPointerDown: (e: React.PointerEvent<SVGCircleElement>, id: string, terminal: string) => void;
   onTap: (id: string) => void;
 }) {
-  const visual = COMPONENT_VISUALS[comp.type];
+  const visual = getComponentVisual(comp);
   const downPos = useRef<{ x: number; y: number } | null>(null);
   const moved = useRef(false);
 
@@ -87,22 +95,36 @@ export function ComponentNode({
         <MotorSymbol comp={comp} voltageAcross={device?.voltageAcross ?? 0} current={device?.current ?? 0} />
       )}
 
-      {Object.entries(visual.terminals).map(([name, pos]) => (
-        <g key={name}>
-          <circle
-            cx={pos.x}
-            cy={pos.y}
-            r={14}
-            fill="transparent"
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              onTerminalPointerDown(e, comp.id, name);
-            }}
-            style={{ cursor: 'crosshair', touchAction: 'none' }}
-          />
-          <circle cx={pos.x} cy={pos.y} r={5} fill="#0f172a" stroke="#facc15" strokeWidth={2} pointerEvents="none" />
-        </g>
-      ))}
+      {Object.entries(visual.terminals).map(([name, pos]) => {
+        const highlighted = isTerminalHighlighted(comp.id, name);
+        return (
+          <g key={name}>
+            {highlighted && (
+              <circle cx={pos.x} cy={pos.y} r={11} fill="#38bdf8" opacity={0.4} pointerEvents="none" />
+            )}
+            <circle
+              cx={pos.x}
+              cy={pos.y}
+              r={14}
+              fill="transparent"
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                onTerminalPointerDown(e, comp.id, name);
+              }}
+              style={{ cursor: 'crosshair', touchAction: 'none' }}
+            />
+            <circle
+              cx={pos.x}
+              cy={pos.y}
+              r={5}
+              fill="#0f172a"
+              stroke={terminalColor(name)}
+              strokeWidth={2}
+              pointerEvents="none"
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

@@ -1,9 +1,10 @@
-import type { BreakerCurve, DeviceResult } from '../../engine/types';
+import type { BreakerCurve, DeviceResult, PoleCount } from '../../engine/types';
 import type { PlacedComponent } from './boardTypes';
 
 const LAMP_COLORS = ['#ffd76a', '#ffffff', '#fca5a5', '#93c5fd', '#86efac'];
 const BREAKER_RATINGS = [6, 10, 16, 20, 25, 32, 40];
 const CURVES: BreakerCurve[] = ['B', 'C', 'D'];
+const POLE_COUNTS: PoleCount[] = [1, 2, 3, 4];
 
 interface Props {
   comp: PlacedComponent | null;
@@ -41,22 +42,64 @@ export function Inspector({ comp, device, onUpdate, onRemove, onReset, onToggleS
       )}
 
       {comp.type === 'source' && (
-        <label className="field">
-          <span>الجهد: {comp.voltage}V</span>
-          <input
-            type="range"
-            min={100}
-            max={260}
-            value={comp.voltage}
-            onChange={(e) => onUpdate(comp.id, { voltage: Number(e.target.value) })}
-          />
-        </label>
+        <>
+          <button className="btn" onClick={() => onUpdate(comp.id, { on: !comp.on })}>
+            {comp.on ? 'إيقاف المصدر (OFF)' : 'تشغيل المصدر (ON)'}
+          </button>
+          <label className="field">
+            <span>نوع الجهد</span>
+            <div className="segmented">
+              <button
+                className={comp.phase === 'single' ? 'segmented__btn is-active' : 'segmented__btn'}
+                onClick={() => onUpdate(comp.id, { phase: 'single' })}
+              >
+                أحادي (L/N)
+              </button>
+              <button
+                className={comp.phase === 'three' ? 'segmented__btn is-active' : 'segmented__btn'}
+                onClick={() => onUpdate(comp.id, { phase: 'three' })}
+              >
+                ثلاثي (L1/L2/L3/N)
+              </button>
+            </div>
+          </label>
+          <label className="field">
+            <span>الجهد بين كل خط والنيوترال: {comp.voltage}V</span>
+            <input
+              type="range"
+              min={100}
+              max={260}
+              value={comp.voltage}
+              onChange={(e) => onUpdate(comp.id, { voltage: Number(e.target.value) })}
+            />
+          </label>
+          {comp.phase === 'three' && (
+            <p className="inspector__hint-inline">
+              بين أي خطين (L1-L2 مثلاً) هيبقى الجهد أعلى (≈{Math.round(comp.voltage * Math.sqrt(3))}V) لأنه فرق بين
+              فازتين، مش خط ونيوترال.
+            </p>
+          )}
+        </>
       )}
 
       {comp.type === 'mcb' && (
         <>
           <label className="field">
-            <span>التيار الاسمي</span>
+            <span>عدد الأقطاب (Poles)</span>
+            <div className="segmented">
+              {POLE_COUNTS.map((p) => (
+                <button
+                  key={p}
+                  className={p === comp.poles ? 'segmented__btn is-active' : 'segmented__btn'}
+                  onClick={() => onUpdate(comp.id, { poles: p })}
+                >
+                  {p}P
+                </button>
+              ))}
+            </div>
+          </label>
+          <label className="field">
+            <span>التيار الاسمي (لكل قطب)</span>
             <select value={comp.rating} onChange={(e) => onUpdate(comp.id, { rating: Number(e.target.value) })}>
               {BREAKER_RATINGS.map((r) => (
                 <option key={r} value={r}>
@@ -79,6 +122,12 @@ export function Inspector({ comp, device, onUpdate, onRemove, onReset, onToggleS
               ))}
             </div>
           </label>
+          {comp.poles > 1 && (
+            <p className="inspector__hint-inline">
+              كل القواطع في نفس القاطع بتفصل مع بعض (Common Trip): لو أي قطب واحد سحب تيار أعلى من المسموح، القاطع
+              بالكامل بيفصل كل الأقطاب.
+            </p>
+          )}
           {comp.tripped && (
             <button className="btn btn--warn" onClick={() => onReset(comp.id)}>
               إعادة ضبط القاطع

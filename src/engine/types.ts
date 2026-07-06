@@ -25,15 +25,22 @@ interface BaseComponent {
   type: ComponentType;
 }
 
+export type PhaseMode = 'single' | 'three';
+
 export interface SourceComponent extends BaseComponent {
   type: 'source';
-  voltage: number; // 100-260 V
+  voltage: number; // 100-260 V, phase-to-neutral magnitude
+  phase: PhaseMode;
+  on: boolean;
 }
+
+export type PoleCount = 1 | 2 | 3 | 4;
 
 export interface McbComponent extends BaseComponent {
   type: 'mcb';
   rating: number; // A: 6,10,16,20,25,32,40
   curve: BreakerCurve;
+  poles: PoleCount;
   tripped: boolean;
 }
 
@@ -80,15 +87,32 @@ export type CircuitComponent =
   | LampComponent
   | MotorComponent;
 
-export const TERMINALS: Record<ComponentType, string[]> = {
-  source: ['L', 'N'],
-  mcb: ['in', 'out'],
-  switch: ['in', 'out'],
-  fuse: ['in', 'out'],
-  relay: ['A1', 'A2', 'C', 'NO'],
-  lamp: ['in', 'out'],
-  motor: ['in', 'out'],
-};
+export function sourceTerminalNames(phase: PhaseMode): string[] {
+  return phase === 'three' ? ['L1', 'L2', 'L3', 'N'] : ['L', 'N'];
+}
+
+export function mcbTerminalNames(poles: PoleCount): string[] {
+  if (poles === 1) return ['in', 'out'];
+  const names: string[] = [];
+  for (let i = 1; i <= poles; i++) names.push(`in${i}`, `out${i}`);
+  return names;
+}
+
+export function terminalNamesFor(c: CircuitComponent): string[] {
+  switch (c.type) {
+    case 'source':
+      return sourceTerminalNames(c.phase);
+    case 'mcb':
+      return mcbTerminalNames(c.poles);
+    case 'switch':
+    case 'fuse':
+    case 'lamp':
+    case 'motor':
+      return ['in', 'out'];
+    case 'relay':
+      return ['A1', 'A2', 'C', 'NO'];
+  }
+}
 
 export type TripEvent = 'SHORT_CIRCUIT' | 'OVERLOAD' | null;
 
