@@ -66,9 +66,15 @@
     const trim = path.startsWith("e_trim/");
     return `${CLD}/image/upload/${trim ? "e_trim/" : ""}f_auto,q_auto,w_${w}/${trim ? path.slice(7) : path}`;
   };
-  const srcset = (path, ws) => (LOCAL ? LOCAL.srcset(path) : ws.map((w) => `${imgUrl(path, w)} ${w}w`).join(", "));
-  const pic = (path, { alt = "", sizes = "100vw", cls = "", eager = false, ws = [480, 800, 1200, 1600] } = {}) =>
-    `<img${cls ? ` class="${cls}"` : ""} src="${imgUrl(path, 1200)}" srcset="${srcset(path, ws)}" sizes="${sizes}" alt="${esc(alt)}" ${
+  // Original pixel width of every image: never request (or upscale) beyond the source.
+  const ORIG = Object.assign({}, ...PROJECTS.map((p) => p.widths || {}));
+  const widthsFor = (path, ws) => {
+    const max = ORIG[path] || 4000;
+    return [...new Set([...ws.filter((w) => w < max), Math.min(max, ws[ws.length - 1])])];
+  };
+  const srcset = (path, ws) => (LOCAL ? LOCAL.srcset(path) : widthsFor(path, ws).map((w) => `${imgUrl(path, w)} ${w}w`).join(", "));
+  const pic = (path, { alt = "", sizes = "100vw", cls = "", eager = false, ws = [480, 800, 1200, 1600, 2000, 2400] } = {}) =>
+    `<img${cls ? ` class="${cls}"` : ""} src="${imgUrl(path, Math.min(1200, ORIG[path] || 1200))}" srcset="${srcset(path, ws)}" sizes="${sizes}" alt="${esc(alt)}" ${
       eager ? 'fetchpriority="high"' : 'loading="lazy"'
     } decoding="async">`;
   const videoTag = (path, w, label) => {
@@ -95,6 +101,7 @@
   /* ---------- Pages ---------- */
   function homeHTML() {
     return `
+    <div class="stage-pin" id="stagePin">
     <section class="stage" id="stage" aria-labelledby="hero-title">
       <div class="stage__media" id="heroMedia">
         <picture>
@@ -112,7 +119,10 @@
         <h1 id="hero-title" class="stage__name" data-split="chars" style="--d:.1s">Selvana <em>Essam</em></h1>
         <p class="stage__line" data-reveal style="--d:.7s">Creative director for brands, sets and spaces</p>
       </div>
+      <div class="stage__curtain stage__curtain--l velvet" aria-hidden="true"></div>
+      <div class="stage__curtain stage__curtain--r velvet" aria-hidden="true"></div>
     </section>
+    </div>
 
     <section class="section" aria-label="Approach">
       <div class="wrap statement">
@@ -133,7 +143,7 @@
               (p) => `
             <div class="stack__item">
               <a class="fcard" href="#/work/${p.slug}" data-cursor="View">
-                ${p.video ? videoTag(p.video, 1280, `${p.title} campaign film`) : pic(p.cover, { alt: p.title, sizes: "100vw" })}
+                ${pic(p.cover, { alt: p.title, sizes: "(max-width: 1440px) 100vw, 1330px" })}
                 <div class="fcard__caption"><h3 class="fcard__title">${esc(p.title)}</h3><span class="small">${esc(DISC[p.discipline].name)}</span></div>
                 <span class="fcard__dim"></span>
               </a>
@@ -188,9 +198,10 @@
     const portrait = p.slug === "closer" || p.slug === "lavern";
     const arabic = isArabic(p.subtitle);
     let lbIndex = 0;
-    const gallery = p.gallery
+    const items = p.video ? [`video:${p.video}`, ...p.gallery] : p.gallery;
+    const gallery = items
       .map((g, k) => {
-        const full = !portrait && k % 3 === 0;
+        const full = !portrait && k % 3 === 0 && (ORIG[g] || 0) >= 1600;
         if (g.startsWith("video:")) {
           return `<figure class="g${full ? " g--full" : ""}" data-reveal="img">${videoTag(g.slice(6), 1280, `${p.title} film ${k + 1}`)}</figure>`;
         }
@@ -213,9 +224,7 @@
       </header>
 
       <div class="wrap">
-        <figure class="p-cover tilt" data-reveal="img">${
-          p.video ? videoTag(p.video, 1600, `${p.title} campaign film`) : pic(p.cover, { alt: `${p.title}, cover image`, eager: true, sizes: "100vw" })
-        }</figure>
+        <figure class="p-cover tilt" data-reveal="img">${pic(p.cover, { alt: `${p.title}, cover image`, eager: true, sizes: "(max-width: 1440px) 100vw, 1330px" })}</figure>
       </div>
 
       <section class="section" aria-label="About the project">
@@ -300,6 +309,27 @@
       <a class="btn" href="#/">Back to the stage</a>
     </div></section>`;
 
+  /* ---------- Smooth scrolling (desktop, motion on) ---------- */
+  let lenis = null;
+  function setupLenis() {
+    if (lenis) {
+      lenis.destroy();
+      lenis = null;
+    }
+    if (finePointer && !reduceMotion && window.Lenis) lenis = new window.Lenis({ lerp: 0.09, wheelMultiplier: 1 });
+  }
+  setupLenis();
+  function scrollToY(y, smooth) {
+    if (lenis) lenis.scrollTo(y, { immediate: !smooth, duration: 1.4 });
+    else window.scrollTo({ top: y, behavior: smooth && !reduceMotion ? "smooth" : "auto" });
+  }
+  function lock(on) {
+    document.body.classList.toggle("is-locked", on);
+    if (!lenis) return;
+    if (on) lenis.stop();
+    else lenis.start();
+  }
+
   /* ---------- Router ---------- */
   const view = $("#view");
   const header = $("#header");
@@ -358,12 +388,11 @@
     if (route.target) {
       const el = $(route.target);
       if (el) {
-        const y = el.getBoundingClientRect().top + window.scrollY - (route.target === "#work" ? header.offsetHeight : 0);
-        window.scrollTo({ top: y, behavior: smooth && !reduceMotion ? "smooth" : "auto" });
+        scrollToY(el.getBoundingClientRect().top + window.scrollY - (route.target === "#work" ? header.offsetHeight : 0), smooth);
         return;
       }
     }
-    if (!smooth) window.scrollTo(0, 0);
+    if (!smooth) scrollToY(0, false);
   }
 
   async function navigate() {
@@ -381,7 +410,7 @@
       updateNav(route);
       if (route.kind === "home") applyFilter(route.params.get("d") || "all", false);
       if (route.target) scrollToTarget(route, true);
-      else window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+      else scrollToY(0, true);
       return;
     }
     if (navigating) return;
@@ -392,14 +421,14 @@
     if (!reduceMotion) {
       curtain.classList.remove("is-up");
       curtain.classList.add("is-down");
-      await wait(600);
+      await wait(520);
     }
     render(route);
     scrollToTarget(route, false);
     view.focus({ preventScroll: true });
     if (!reduceMotion) {
       curtain.classList.replace("is-down", "is-up");
-      await wait(720);
+      await wait(660);
       curtain.classList.remove("is-up");
     }
     navigating = false;
@@ -440,7 +469,7 @@
       return;
     }
     intro.classList.add("is-playing");
-    document.body.classList.add("is-locked");
+    lock(true);
     const heroImg = $("#heroMedia img");
     const ready = heroImg && !heroImg.complete ? new Promise((r) => heroImg.addEventListener("load", r, { once: true })) : Promise.resolve();
     const count = $("#introCount");
@@ -452,7 +481,8 @@
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-    Promise.all([Promise.race([ready, wait(1600)]), wait(1300)]).then(() => {
+    const fonts = document.fonts ? document.fonts.ready : Promise.resolve();
+    Promise.all([Promise.race([Promise.all([ready, fonts]), wait(2200)]), wait(1300)]).then(() => {
       counting = false;
       count.textContent = "100";
       intro.classList.add("is-open");
@@ -463,7 +493,7 @@
       setTimeout(() => heroContent && revealNow(heroContent), 450);
       setTimeout(() => {
         intro.classList.remove("is-playing", "is-open");
-        document.body.classList.remove("is-locked");
+        lock(false);
       }, 1350);
     });
   }
@@ -615,6 +645,26 @@
     }, 300);
   }
 
+  /* ---------- Images fade in once loaded ---------- */
+  document.addEventListener(
+    "load",
+    (e) => {
+      if (e.target.tagName === "IMG") e.target.classList.add("is-loaded");
+    },
+    true
+  );
+  const markLoaded = () => $$("img", view).forEach((im) => im.complete && im.naturalWidth && im.classList.add("is-loaded"));
+
+  // Hovering a project starts loading its cover, so the page opens instantly.
+  const preloaded = new Set();
+  function preloadProject(slug) {
+    const p = bySlug(slug);
+    if (!p || preloaded.has(slug)) return;
+    preloaded.add(slug);
+    const im = new Image();
+    im.src = imgUrl(p.cover, Math.min(1600, ORIG[p.cover] || 1600));
+  }
+
   /* ---------- Floating preview over the project list ---------- */
   let floatPreview = null;
   const fp = { x: 0, y: 0, tx: 0, ty: 0, on: false };
@@ -684,14 +734,14 @@
     if (!lbItems.length) return;
     lbReturn = document.activeElement;
     lb.hidden = false;
-    document.body.classList.add("is-locked");
+    lock(true);
     requestAnimationFrame(() => lb.classList.add("is-open"));
     lbShow(i, lbItems[i]);
     $(".lightbox__close", lb).focus();
   }
   function lbClose() {
     lb.classList.remove("is-open");
-    document.body.classList.remove("is-locked");
+    lock(false);
     setTimeout(() => {
       lb.hidden = true;
       lbStage.innerHTML = "";
@@ -719,7 +769,8 @@
   const menuBtn = $("#menuBtn");
   function openMenu() {
     menu.hidden = false;
-    document.body.classList.add("menu-open", "is-locked");
+    document.body.classList.add("menu-open");
+    lock(true);
     menuBtn.setAttribute("aria-expanded", "true");
     menuBtn.setAttribute("aria-label", "Close menu");
     requestAnimationFrame(() => requestAnimationFrame(() => menu.classList.add("is-open")));
@@ -727,7 +778,8 @@
   function closeMenu() {
     if (menu.hidden) return;
     menu.classList.remove("is-open");
-    document.body.classList.remove("menu-open", "is-locked");
+    document.body.classList.remove("menu-open");
+    lock(false);
     menuBtn.setAttribute("aria-expanded", "false");
     menuBtn.setAttribute("aria-label", "Open menu");
     setTimeout(() => {
@@ -775,6 +827,7 @@
       reduceMotion = !reduceMotion;
       storage.set("selvana-motion", reduceMotion ? "reduced" : "full");
       applyMotion();
+      setupLenis();
       if (current) {
         render(current);
         if (!reduceMotion) revealNow(view);
@@ -805,7 +858,7 @@
     }
   });
 
-  $("#toTop").addEventListener("click", () => window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" }));
+  $("#toTop").addEventListener("click", () => scrollToY(0, true));
 
   /* ---------- Cursor: a dot, a trailing ring, and the stage spotlight ---------- */
   const dot = $("#cursorDot");
@@ -863,6 +916,11 @@
       ring.classList.toggle("is-hidden", Boolean(field));
       dot.classList.toggle("is-hidden", Boolean(field));
       ringLabel.textContent = media ? media.dataset.cursor : "";
+      const dark = Boolean(e.target.closest(".dark, .stage, .next, .footer, .menu, .lightbox"));
+      dot.classList.toggle("on-dark", dark);
+      ring.classList.toggle("on-dark", dark);
+      const proj = e.target.closest('a[href^="#/work/"]');
+      if (proj) preloadProject(proj.getAttribute("href").split("/")[2]);
       const pv = e.target.closest("[data-preview]");
       if (pv) showPreview(pv.dataset.preview, e);
       else if (fp.on) hidePreview();
@@ -932,6 +990,7 @@
   /* ---------- One animation loop for scroll and pointer motion ---------- */
   let lastY = window.scrollY;
   function frame(t) {
+    if (lenis) lenis.raf(t);
     const y = window.scrollY;
     const vh = window.innerHeight;
     const page = current ? current.kind : "home";
@@ -939,7 +998,8 @@
 
     // Header: transparent over the stage, solid elsewhere, hides while scrolling down.
     const stage = page === "home" ? $("#stage", view) : null;
-    const overStage = stage && y < stage.offsetHeight - header.offsetHeight;
+    const pin = stage ? $("#stagePin", view) : null;
+    const overStage = pin && y < pin.offsetHeight - header.offsetHeight;
     header.classList.toggle("on-dark", Boolean(overStage) && !menuOpen);
     header.classList.toggle("is-solid", !overStage && y > 8 && !menuOpen);
     if (!menuOpen && lb.hidden) {
@@ -956,9 +1016,16 @@
 
     if (!reduceMotion) {
       // Stage: parallax and a spotlight that follows the pointer (or drifts on touch screens).
-      if (stage && y < vh * 1.2) {
+      if (stage && pin && y < pin.offsetHeight) {
+        // While the stage is pinned, scrolling closes the curtains over it.
+        const p = clamp(y / Math.max(1, pin.offsetHeight - vh));
+        const e = p * p * (3 - 2 * p);
+        $(".stage__curtain--l", stage).style.transform = `translateX(${(-101 * (1 - e)).toFixed(2)}%)`;
+        $(".stage__curtain--r", stage).style.transform = `translateX(${(101 * (1 - e)).toFixed(2)}%)`;
         const media = $("#heroMedia", view);
-        if (media) media.style.transform = `translate3d(0, ${y * 0.28}px, 0)`;
+        if (media) media.style.transform = `scale(${(1 + e * 0.08).toFixed(4)})`;
+        const content = $("#heroContent", view);
+        if (content) content.style.opacity = String(clamp(1 - e * 1.6));
         if (!(finePointer && spot.inside)) {
           spot.tx = 50 + Math.sin(t / 2600) * 10;
           spot.ty = 34 + Math.sin(t / 3700) * 6;
@@ -1022,6 +1089,7 @@
   }
 
   function initPage(route) {
+    requestAnimationFrame(markLoaded);
     initScrub();
     initReveals();
     initVideos();

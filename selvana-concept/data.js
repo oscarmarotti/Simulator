@@ -1,6 +1,7 @@
 /* Content for the Selvana Essam portfolio concept.
  * Text and media are taken from selvana.art; media is served from Selvana's Cloudinary account.
- * Gallery entries prefixed with "video:" are Cloudinary videos; "e_trim/" crops white slide borders. */
+ * Gallery entries prefixed with "video:" are Cloudinary videos; "e_trim/" crops white slide borders.
+ * "widths" holds each image's original pixel width, so no image is ever served larger than its source. */
 window.SELVANA = {
   "projects": [
     {
@@ -38,7 +39,15 @@ window.SELVANA = {
         "v1790788453/573211676_18379599301148569_8783623790976227836_n_curhj2.jpg",
         "v1790788465/574529240_18379599250148569_86189204066355755_n_eb84ad.jpg"
       ],
-      "renders": false
+      "renders": false,
+      "widths": {
+        "v1790788446/572040295_18379599217148569_6576358955398261144_n_suhrjj.jpg": 1080,
+        "v1790788457/573705153_18379599292148569_6236305708123935734_n_y6u5hi.jpg": 1080,
+        "v1790788461/573835479_18379599283148569_5363533456503602805_n_fgkayy.jpg": 1080,
+        "v1790788449/572468171_18379599226148569_1103634615938930768_n_d9wpcx.jpg": 1080,
+        "v1790788453/573211676_18379599301148569_8783623790976227836_n_curhj2.jpg": 1080,
+        "v1790788465/574529240_18379599250148569_86189204066355755_n_eb84ad.jpg": 1080
+      }
     },
     {
       "slug": "lavern",
@@ -52,7 +61,7 @@ window.SELVANA = {
       ],
       "type": "Client project",
       "summary": "A set and visual world for a fragrance campaign — the space became part of the story.",
-      "cover": "v1791060991/selvana/projects/direction/lavern/hcigh2nm2hujdwp75kf9.jpg",
+      "cover": "v1791060895/selvana/projects/direction/lavern/eto5u5a1xntu4isvjstd.jpg",
       "hover": "v1791060899/selvana/projects/direction/lavern/pmlkldmoxefmmx32dysr.jpg",
       "video": "v1791060985/selvana/projects/direction/lavern/nmniyolmkmgcb7zqfl96",
       "scope": [
@@ -78,7 +87,14 @@ window.SELVANA = {
         "v1791060991/selvana/projects/direction/lavern/hcigh2nm2hujdwp75kf9.jpg",
         "v1791060997/selvana/projects/direction/lavern/yfag2krwvlfiz72jy69e.jpg"
       ],
-      "renders": false
+      "renders": false,
+      "widths": {
+        "v1791060895/selvana/projects/direction/lavern/eto5u5a1xntu4isvjstd.jpg": 1724,
+        "v1791060899/selvana/projects/direction/lavern/pmlkldmoxefmmx32dysr.jpg": 1605,
+        "v1791060903/selvana/projects/direction/lavern/i9wgso1eoq85xykiq6fe.jpg": 1605,
+        "v1791060991/selvana/projects/direction/lavern/hcigh2nm2hujdwp75kf9.jpg": 1290,
+        "v1791060997/selvana/projects/direction/lavern/yfag2krwvlfiz72jy69e.jpg": 1290
+      }
     },
     {
       "slug": "re-play",
@@ -117,7 +133,16 @@ window.SELVANA = {
         "v1790788584/SAAS_aybvq7.jpg",
         "v1790788588/zs_zok3yf.jpg"
       ],
-      "renders": true
+      "renders": true,
+      "widths": {
+        "v1790788576/ccc_a7kxec.jpg": 1280,
+        "v1790788558/2_tnmprw.jpg": 1280,
+        "v1790788568/555_yosamu.jpg": 1280,
+        "v1790788572/BHB_lnrfef.jpg": 1280,
+        "v1790788581/ChatGPT_Image_Sep_26_2026_05_51_06_PM_gg7kcs.png": 1672,
+        "v1790788584/SAAS_aybvq7.jpg": 1280,
+        "v1790788588/zs_zok3yf.jpg": 1280
+      }
     },
     {
       "slug": "chai",
@@ -160,7 +185,20 @@ window.SELVANA = {
         "v1790787263/16_afcpry.png",
         "v1790787263/7_gjcybx.png"
       ],
-      "renders": true
+      "renders": true,
+      "widths": {
+        "v1790787250/5_hkbku2.png": 1920,
+        "v1790787247/4_bs4n4t.png": 1920,
+        "v1790787252/8_rvw5fn.png": 1920,
+        "v1790787253/9_yztk3m.png": 1920,
+        "v1790787256/11_plmjka.png": 1920,
+        "v1790787258/10_z289sw.png": 1920,
+        "v1790787258/12_qzgnju.png": 1920,
+        "v1790787260/13_ovhmgk.png": 1920,
+        "v1790787262/15_rvspzu.png": 1920,
+        "v1790787263/16_afcpry.png": 1920,
+        "v1790787263/7_gjcybx.png": 1920
+      }
     },
     {
       "slug": "colt-coffee",
@@ -206,7 +244,25 @@ window.SELVANA = {
         "e_trim/v1790787607/colt-16.jpg_speeid.jpg",
         "e_trim/v1790787615/colt-13.jpg_uwgoic.jpg"
       ],
-      "renders": false
+      "renders": false,
+      "widths": {
+        "e_trim/v1790787583/colt_1-04.jpg_rqy0aj.jpg": 4500,
+        "e_trim/v1790787584/colt_1-05.jpg_z0jkmj.jpg": 4500,
+        "e_trim/v1790787585/colt_1-06.jpg_pxtcwd.jpg": 4500,
+        "e_trim/v1790787587/colt_1-07.jpg_zteswk.jpg": 4500,
+        "e_trim/v1790787590/colt_1-08.jpg_egaa8x.jpg": 4500,
+        "e_trim/v1790787590/colt_1-09.jpg_xyb5q0.jpg": 4500,
+        "e_trim/v1790787596/colt-11.jpg_ppsmzn.jpg": 4500,
+        "e_trim/v1790787599/colt_1-17.jpg_x7afur.jpg": 4500,
+        "e_trim/v1790787600/colt-12.jpg_fnzxfs.jpg": 4500,
+        "e_trim/v1790787601/Untitled_design_26_r09mia.png": 4500,
+        "e_trim/v1790787603/Untitled_design_27_jchxrn.png": 4500,
+        "e_trim/v1790787605/colt-14.jpg_dkcgh6.jpg": 4500,
+        "e_trim/v1790787606/colt-10.jpg_kwtrdm.jpg": 4500,
+        "e_trim/v1790787607/colt-15.jpg_gujmco.jpg": 4500,
+        "e_trim/v1790787607/colt-16.jpg_speeid.jpg": 4500,
+        "e_trim/v1790787615/colt-13.jpg_uwgoic.jpg": 4500
+      }
     },
     {
       "slug": "horse-park",
@@ -251,7 +307,21 @@ window.SELVANA = {
         "v1790787530/post1-07.jpg_k3vuuq.jpg",
         "v1790787533/post2-12.jpg_tpnumn.jpg"
       ],
-      "renders": false
+      "renders": false,
+      "widths": {
+        "v1790787525/post2-11.jpg_kwykkk.jpg": 4500,
+        "v1790787511/761585081_18116300281839975_3033399272195792326_n_tfh8nr.jpg": 2148,
+        "v1790787511/763778425_18116437462839975_747395101484685220_n_pudrqw.jpg": 2148,
+        "v1790787515/763778681_18116437447839975_6133524750105069368_n_u75hzc.jpg": 2148,
+        "v1790787515/763992867_18116300221839975_1491342264916999992_n_mz1mva.jpg": 2148,
+        "v1790787516/764636975_18116437471839975_337842301546645856_n_uvkp6d.jpg": 2148,
+        "v1790787519/764638325_18116300299839975_3854131530924574320_n_y6ekeq.jpg": 2148,
+        "v1790787520/766121387_18116437456839975_5030975468211388802_n_bqonaw.jpg": 2148,
+        "v1790787526/post1-06.jpg_h784d1.jpg": 4500,
+        "v1790787529/post2-14.jpg_kilgss.jpg": 4500,
+        "v1790787530/post1-07.jpg_k3vuuq.jpg": 4500,
+        "v1790787533/post2-12.jpg_tpnumn.jpg": 4500
+      }
     },
     {
       "slug": "marbat",
@@ -293,7 +363,19 @@ window.SELVANA = {
         "v1790787442/marbattt-09.jpg_cmpgc6.jpg",
         "v1790787444/marbattt-10.jpg_mvl4it.jpg"
       ],
-      "renders": false
+      "renders": false,
+      "widths": {
+        "v1790787432/marbattt-01.jpg_st68kf.jpg": 5321,
+        "v1790787426/7_idjwp7.png": 1280,
+        "v1790787428/8_slu2ak.png": 1280,
+        "v1790787429/9_re1avd.png": 1280,
+        "v1790787433/marbattt-02.jpg_xeytxz.jpg": 5321,
+        "v1790787435/marbattt-04.jpg_uknhuc.jpg": 5321,
+        "v1790787439/marbattt-07.jpg_xppwuv.jpg": 5321,
+        "v1790787441/marbattt-08.jpg_lmd1zs.jpg": 5321,
+        "v1790787442/marbattt-09.jpg_cmpgc6.jpg": 5321,
+        "v1790787444/marbattt-10.jpg_mvl4it.jpg": 5321
+      }
     },
     {
       "slug": "smile-cafe",
@@ -345,7 +427,29 @@ window.SELVANA = {
         "v1790787723/26_f8npmi.png",
         "v1790787725/29_g5ou9w.png"
       ],
-      "renders": false
+      "renders": false,
+      "widths": {
+        "v1790787688/1_2_r5wkhw.png": 1920,
+        "v1790787684/1_wynvuq.png": 1920,
+        "v1790787684/2_2_xgwg4v.png": 1920,
+        "v1790787687/2_jxs1dh.png": 1920,
+        "v1790787688/3_oaxrgi.png": 1920,
+        "v1790787691/4_2_t4x5ce.png": 1920,
+        "v1790787695/4_rkwlan.png": 1920,
+        "v1790787695/5_2_uysxzd.png": 1920,
+        "v1790787701/5_ncqzuk.png": 1920,
+        "v1790787702/7_o8rix6.png": 1920,
+        "v1790787706/10_enggob.png": 1920,
+        "v1790787709/12_cwnagp.png": 1920,
+        "v1790787711/16_yvh1hq.png": 1920,
+        "v1790787712/11_rslyf4.png": 1920,
+        "v1790787714/17_jzbokt.png": 1920,
+        "v1790787714/18_zv98on.png": 1920,
+        "v1790787716/20_mvjxzv.png": 1920,
+        "v1790787719/24_grupjf.png": 1920,
+        "v1790787723/26_f8npmi.png": 1920,
+        "v1790787725/29_g5ou9w.png": 1920
+      }
     },
     {
       "slug": "aghyar",
@@ -390,7 +494,21 @@ window.SELVANA = {
         "v1790788121/9_xoieyi.png",
         "v1790788126/12_cxrbwe.png"
       ],
-      "renders": true
+      "renders": true,
+      "widths": {
+        "v1790788104/6_in7liq.png": 4500,
+        "v1790788073/1_h9gzkc.png": 4500,
+        "v1790788085/2_ag61ee.png": 4500,
+        "v1790788086/3_qnkgpb.png": 4500,
+        "v1790788091/5_dxeph4.png": 4500,
+        "v1790788098/4_wrfyec.png": 4500,
+        "v1790788109/7_rpfnyy.png": 4500,
+        "v1790788114/8_b0ewwa.png": 4500,
+        "v1790788119/10_emvoxw.png": 4500,
+        "v1790788120/11_snmng8.png": 4500,
+        "v1790788121/9_xoieyi.png": 4500,
+        "v1790788126/12_cxrbwe.png": 4500
+      }
     },
     {
       "slug": "bridge-to-terabithia",
@@ -466,7 +584,48 @@ window.SELVANA = {
         "v1790788328/38_qfoonh.png",
         "v1790788332/39_rnymok.png"
       ],
-      "renders": true
+      "renders": true,
+      "widths": {
+        "v1790788167/1_aprvo7.png": 1920,
+        "v1790788169/2_uzwoxq.png": 1920,
+        "v1790788175/3_dj8zdi.png": 1920,
+        "v1790788178/4_jfr3jt.png": 1920,
+        "v1790788182/5_l9oov3.png": 1920,
+        "v1790788185/6_oqhdwl.png": 1920,
+        "v1790788189/7_laomjg.png": 1920,
+        "v1790788192/8_bilekx.png": 1920,
+        "v1790788196/9_glfz5a.png": 1920,
+        "v1790788201/10_fd4uy0.png": 1920,
+        "v1790788204/11_lde4at.png": 1920,
+        "v1790788209/12_p4sl4h.png": 1920,
+        "v1790788212/13_yufs4i.png": 1920,
+        "v1790788215/14_v9j50d.png": 1920,
+        "v1790788220/15_c3qgzq.png": 1920,
+        "v1790788228/16_c3ftjj.png": 1920,
+        "v1790788232/18_ozqfwm.png": 1920,
+        "v1790788233/17_vqkz8i.png": 1920,
+        "v1790788238/19_co9yuu.png": 1920,
+        "v1790788240/20_zqbr8m.png": 1920,
+        "v1790788246/21_lgby1j.png": 1920,
+        "v1790788251/22_czjofo.png": 1920,
+        "v1790788256/23_fxplja.png": 1920,
+        "v1790788259/24_zlafjz.png": 1920,
+        "v1790788269/26_jlo2s0.png": 1920,
+        "v1790788270/25_xnphth.png": 1920,
+        "v1790788271/27_j0yz9n.png": 1920,
+        "v1790788279/28_at5kpr.png": 1920,
+        "v1790788282/29_nd5uw1.png": 1920,
+        "v1790788288/30_gaotnz.png": 1920,
+        "v1790788292/31_lrhmhf.png": 1920,
+        "v1790788297/32_rehx3m.png": 1920,
+        "v1790788302/33_mqiao7.png": 1920,
+        "v1790788309/34_qeubf3.png": 1920,
+        "v1790788312/35_eqn5fm.png": 1920,
+        "v1790788318/36_msbk5n.png": 1920,
+        "v1790788321/37_buk2mj.png": 1920,
+        "v1790788328/38_qfoonh.png": 1920,
+        "v1790788332/39_rnymok.png": 1920
+      }
     },
     {
       "slug": "haret-el-lamoun",
@@ -510,7 +669,21 @@ window.SELVANA = {
         "v1790787850/ChatGPT_Image_Sep_26_2026_06_51_21_PM_oylkxo.png",
         "v1790787854/ChatGPT_Image_Sep_26_2026_06_54_06_PM_b1u2gw.png"
       ],
-      "renders": true
+      "renders": true,
+      "widths": {
+        "v1790787860/ChatGPT_Image_Sep_26_2026_06_56_37_PM_sodmj2.png": 1732,
+        "v1790787822/1_fpmqxw.png": 4500,
+        "v1790787826/2_nbjply.png": 4500,
+        "v1790787854/ChatGPT_Image_Sep_26_2026_06_54_40_PM_sreifd.png": 1733,
+        "v1790787861/ChatGPT_Image_Sep_26_2026_07_00_08_PM_lyps95.png": 1733,
+        "v1790787862/ChatGPT_Image_Sep_26_2026_06_58_32_PM_cpa5yv.png": 1733,
+        "v1790787825/8_w3aqp6.png": 4500,
+        "v1790787829/9_yntbiu.png": 4500,
+        "v1790787832/ChatGPT_Image_Sep_26_2026_06_42_10_PM_esjdwc.png": 1732,
+        "v1790787835/ChatGPT_Image_Sep_26_2026_06_49_00_PM_necjd9.png": 1733,
+        "v1790787850/ChatGPT_Image_Sep_26_2026_06_51_21_PM_oylkxo.png": 1732,
+        "v1790787854/ChatGPT_Image_Sep_26_2026_06_54_06_PM_b1u2gw.png": 1733
+      }
     },
     {
       "slug": "haret-el-ghagar",
@@ -553,7 +726,18 @@ window.SELVANA = {
         "v1790788401/ChatGPT_Image_Sep_26_2026_06_15_00_PM_phgdvf.png",
         "v1790788397/ChatGPT_Image_Sep_26_2026_06_14_19_PM_o5xqok.png"
       ],
-      "renders": true
+      "renders": true,
+      "widths": {
+        "v1791061537/selvana/projects/campaign/the-gypsy-quarter/jpdfglpbtsel1fkw2hou.jpg": 1733,
+        "v1791061543/selvana/projects/campaign/the-gypsy-quarter/yttgvfw5julprynmozmd.jpg": 1023,
+        "v1790788394/ChatGPT_Image_Sep_26_2026_06_03_17_PM_fhqflf.png": 1734,
+        "v1791061517/selvana/projects/campaign/the-gypsy-quarter/nwp9l6mfaekdvira3z71.jpg": 1536,
+        "v1791061530/selvana/projects/campaign/the-gypsy-quarter/hnoqqlqbylczuctqo3e0.jpg": 1734,
+        "v1791061524/selvana/projects/campaign/the-gypsy-quarter/lezhtiqf8w9u9kifxkn2.jpg": 1536,
+        "v1790788388/16_ejacsh.png": 4500,
+        "v1790788401/ChatGPT_Image_Sep_26_2026_06_15_00_PM_phgdvf.png": 1732,
+        "v1790788397/ChatGPT_Image_Sep_26_2026_06_14_19_PM_o5xqok.png": 1733
+      }
     }
   ]
 };

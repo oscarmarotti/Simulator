@@ -44,6 +44,16 @@ Cursor (desktop): a dot plus a trailing ring that grows over links and says *Vie
 
 The **Motion** switch in the footer turns animation off or on. It follows the system setting by default.
 
+Finishing touches:
+
+- **Real velvet.** The intro curtain, the page-change curtain and the closing curtains use velvet taken from the stage photo itself (`assets/velvet.webp`, 23 KB).
+- **The show ends as you scroll.** The stage stays pinned while the curtains close over it, then the site continues.
+- **Smooth scrolling** on desktop ([Lenis](https://github.com/darkroomengineering/lenis)). Phones keep their native scrolling.
+- **Images fade in** once loaded instead of popping in. Hovering a project starts loading its cover so the page opens instantly.
+- **Sharpness.** Every image is served up to its original resolution (stored as `widths` in `data.js`) and never upscaled. The featured LAVERN card and cover use the sharpest still instead of the 960 px film, and the film sits in the gallery.
+- **Clean cursor.** Dark ink on light sections, cream on dark ones, instead of colour inversion.
+- **Fonts first.** The intro waits for the fonts, so the name never flashes in a fallback typeface.
+
 ## How each review issue was fixed
 
 | Review issue | Fix |

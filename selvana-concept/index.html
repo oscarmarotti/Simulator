@@ -15,9 +15,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Instrument+Sans:wdth,wght@75..100,400..700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Instrument+Sans:wdth,wght@75..100,400..700&display=block" rel="stylesheet" />
   <link rel="preload" as="image" href="assets/stage-1536.webp" media="(min-width: 700px)" />
   <link rel="preload" as="image" href="assets/stage-portrait.webp" media="(max-width: 699px)" />
+  <link rel="preload" as="image" href="assets/velvet.webp" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -25,13 +26,13 @@
 
   <!-- First-visit intro: the curtain rises on the stage -->
   <div class="intro" id="intro" aria-hidden="true">
-    <div class="intro__panel intro__panel--l"></div>
-    <div class="intro__panel intro__panel--r"></div>
+    <div class="intro__panel intro__panel--l velvet"></div>
+    <div class="intro__panel intro__panel--r velvet"></div>
     <div class="intro__mark"><span>Selvana</span><b class="intro__count" id="introCount">000</b></div>
   </div>
 
   <!-- Page transition: a velvet curtain drops between pages -->
-  <div class="curtain" id="curtain" aria-hidden="true"><span class="curtain__mark">Selvana</span></div>
+  <div class="curtain velvet" id="curtain" aria-hidden="true"><span class="curtain__mark">Selvana</span></div>
 
   <div class="progress" id="progress" aria-hidden="true"></div>
 
@@ -87,6 +88,7 @@
 
   <noscript><p class="noscript">This portfolio needs JavaScript for its gallery. Email <a href="mailto:selvanaessam778@gmail.com">selvanaessam778@gmail.com</a>.</p></noscript>
 
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
