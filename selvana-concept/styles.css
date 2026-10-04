@@ -137,9 +137,9 @@ em { font-style: italic; }
 /* ---------- Header ---------- */
 .header {
   position: fixed; inset: 0 0 auto 0; z-index: 60;
-  height: var(--header-h);
+  height: calc(var(--header-h) + env(safe-area-inset-top, 0px));
   display: flex; align-items: center; gap: 32px;
-  padding: 0 var(--gutter);
+  padding: env(safe-area-inset-top, 0px) var(--gutter) 0;
   color: var(--ink);
   transition: transform 0.5s var(--ease-out), background-color 0.4s, color 0.4s, box-shadow 0.4s;
 }

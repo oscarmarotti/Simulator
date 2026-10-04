@@ -52,20 +52,26 @@
   const esc = (s) =>
     String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const bySlug = (slug) => PROJECTS.find((p) => p.slug === slug);
-  const isArabic = (s) => /[؀-ۿ]/.test(s);
+  const isArabic = (s) => /[\u0600-\u06FF]/.test(s);
   const txt = (s) => (isArabic(s) ? `<span lang="ar" dir="rtl">${esc(s)}</span>` : esc(s));
 
+  // Optional self-hosted media map (a sandboxed preview can't load images from Cloudinary).
+  const LOCAL = window.SELVANA_LOCAL || null;
   const imgUrl = (path, w) => {
+    if (LOCAL) return LOCAL.img(path, w);
     const trim = path.startsWith("e_trim/");
     return `${CLD}/image/upload/${trim ? "e_trim/" : ""}f_auto,q_auto,w_${w}/${trim ? path.slice(7) : path}`;
   };
-  const srcset = (path, ws) => ws.map((w) => `${imgUrl(path, w)} ${w}w`).join(", ");
+  const srcset = (path, ws) => (LOCAL ? LOCAL.srcset(path) : ws.map((w) => `${imgUrl(path, w)} ${w}w`).join(", "));
   const pic = (path, { alt = "", sizes = "100vw", cls = "", eager = false, ws = [480, 800, 1200, 1600] } = {}) =>
     `<img${cls ? ` class="${cls}"` : ""} src="${imgUrl(path, 1200)}" srcset="${srcset(path, ws)}" sizes="${sizes}" alt="${esc(alt)}" ${
       eager ? 'fetchpriority="high"' : 'loading="lazy"'
     } decoding="async">`;
-  const videoTag = (path, w, label) =>
-    `<video class="lazy-video" muted loop playsinline preload="none" aria-label="${esc(label)}" poster="${CLD}/video/upload/so_0,f_jpg,q_auto,w_${w}/${path}.jpg" data-src="${CLD}/video/upload/q_auto,w_${w}/${path}.mp4"></video>`;
+  const videoTag = (path, w, label) => {
+    const poster = LOCAL ? LOCAL.poster(path) : `${CLD}/video/upload/so_0,f_jpg,q_auto,w_${w}/${path}.jpg`;
+    const src = LOCAL ? LOCAL.video(path) : `${CLD}/video/upload/q_auto,w_${w}/${path}.mp4`;
+    return `<video class="lazy-video" muted loop playsinline preload="none" aria-label="${esc(label)}" poster="${poster}" data-src="${src}"></video>`;
+  };
 
   /* ---------- Shared blocks ---------- */
   const typeTag = (p) => (p.type === "Client project" ? "" : `<span class="card__tag">${esc(p.type.split(" ·")[0])}</span>`);
@@ -118,9 +124,9 @@
             </div>
             <div class="form__actions">
               <button class="btn btn--light magnetic" type="submit" data-via="email">Send by email <span class="arrow">→</span></button>
-              <button class="btn btn--ghost magnetic" type="button" data-via="whatsapp">Send on WhatsApp</button>
+              <a class="btn btn--ghost magnetic" id="waLink" href="https://wa.me/${WHATSAPP}" target="_blank" rel="noopener">Send on WhatsApp</a>
             </div>
-            <p class="form__note">Opens your email app or WhatsApp with the brief already written. Nothing is stored on this site.</p>
+            <p class="form__note">Opens your email app or WhatsApp with the brief already written, and copies it too. Nothing is stored on this site.</p>
           </form>
         </div>
       </div>
@@ -440,8 +446,9 @@
   let firstRender = true;
   let navigating = false;
 
+  let routePath = location.hash.replace(/^#/, "") || "/";
   function parseRoute() {
-    const raw = location.hash.replace(/^#/, "") || "/";
+    const raw = routePath || "/";
     const [path, query] = raw.split("?");
     const params = new URLSearchParams(query || "");
     const parts = path.split("/").filter(Boolean);
@@ -541,7 +548,31 @@
     navigating = false;
   }
 
-  window.addEventListener("hashchange", navigate);
+  // Links are routed in-page; the URL is updated where the browser allows it
+  // (sandboxed previews refuse history changes, so the route also lives in memory).
+  function go(hash) {
+    routePath = hash.replace(/^#/, "") || "/";
+    try {
+      history.pushState(null, "", hash);
+    } catch {
+      /* keep the in-memory route */
+    }
+    navigate();
+  }
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest('a[href^="#/"]');
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    go(a.getAttribute("href"));
+  });
+  const fromLocation = () => {
+    const h = location.hash.replace(/^#/, "") || "/";
+    if (h === routePath) return;
+    routePath = h;
+    navigate();
+  };
+  window.addEventListener("popstate", fromLocation);
+  window.addEventListener("hashchange", fromLocation);
 
   /* ---------- First-visit intro: the curtain rises ---------- */
   function playIntro(route) {
@@ -840,12 +871,12 @@
 
   /* ---------- Toast ---------- */
   let toastT = 0;
-  function toast(msg) {
+  function toast(msg, ms = 2200) {
     const t = $("#toast");
     t.textContent = msg;
     t.classList.add("is-on");
     clearTimeout(toastT);
-    toastT = setTimeout(() => t.classList.remove("is-on"), 2200);
+    toastT = setTimeout(() => t.classList.remove("is-on"), ms);
   }
 
   /* ---------- Delegated interactions ---------- */
@@ -854,13 +885,19 @@
     if (f) {
       applyFilter(f.dataset.f);
       const hash = f.dataset.f === "all" ? "#/work" : `#/work?d=${f.dataset.f}`;
-      history.replaceState(null, "", hash);
+      routePath = hash.slice(1);
+      try {
+        history.replaceState(null, "", hash);
+      } catch {
+        /* keep the in-memory route */
+      }
       current = parseRoute();
       return;
     }
     const type = e.target.closest(".type");
     if (type) {
       type.setAttribute("aria-pressed", String(type.getAttribute("aria-pressed") !== "true"));
+      syncWhatsApp(type.closest("form"));
       return;
     }
     const copy = e.target.closest("[data-copy]");
@@ -871,12 +908,6 @@
       else toast(value);
       return;
     }
-    const via = e.target.closest("[data-via]");
-    if (via && via.dataset.via === "whatsapp") {
-      e.preventDefault();
-      sendBrief("whatsapp", via.closest("form"));
-      return;
-    }
     const g = e.target.closest("[data-lb-i]");
     if (g) lbOpen(Number(g.dataset.lbI));
   });
@@ -884,10 +915,21 @@
   document.addEventListener("submit", (e) => {
     if (e.target.id !== "brief") return;
     e.preventDefault();
-    sendBrief("email", e.target);
+    const { subject, body } = buildBrief(e.target);
+    const copied = () => toast(`Brief copied. If no email app opened, paste it into an email to ${EMAIL}`, 5000);
+    if (navigator.clipboard) navigator.clipboard.writeText(`To: ${EMAIL}\nSubject: ${subject}\n\n${body}`).then(copied, () => {});
+    location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   });
+  document.addEventListener("input", (e) => {
+    const form = e.target.closest("#brief");
+    if (form) syncWhatsApp(form);
+  });
+  function syncWhatsApp(form) {
+    const link = $("#waLink", form);
+    if (link) link.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(buildBrief(form).body)}`;
+  }
 
-  function sendBrief(channel, form) {
+  function buildBrief(form) {
     const name = form.elements.name.value.trim();
     const msg = form.elements.message.value.trim();
     const types = $$(".type[aria-pressed='true']", form).map((b) => b.textContent);
@@ -902,12 +944,8 @@
       .join("\n")
       .replace(/\n{3,}/g, "\n\n")
       .trim();
-    if (channel === "whatsapp") {
-      window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(body)}`, "_blank", "noopener");
-    } else {
-      const subject = `New project${types.length ? ` — ${types.join(", ")}` : ""}${name ? ` — ${name}` : ""}`;
-      location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    }
+    const subject = `New project${types.length ? ` — ${types.join(", ")}` : ""}${name ? ` — ${name}` : ""}`;
+    return { subject, body };
   }
 
   document.addEventListener("keydown", (e) => {
