@@ -1,6 +1,6 @@
 /* Selvana Essam — portfolio & CV.
  * Vanilla JS, no build step: in-page router, page templates and motion.
- * Motion is progressive: with prefers-reduced-motion everything is shown statically. */
+ * Motion follows the system setting by default; the "Motion" switch in the footer overrides it. */
 (() => {
   "use strict";
 
@@ -14,7 +14,6 @@
 
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const root = document.documentElement;
-  // Motion follows the system setting by default; the "Motion" switch overrides it.
   let reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   try {
     const saved = localStorage.getItem("selvana-motion");
@@ -30,90 +29,27 @@
       b.setAttribute("aria-pressed", String(!reduceMotion));
       b.querySelector("span").textContent = reduceMotion ? "Motion off" : "Motion on";
     });
-    const scene = document.getElementById("scene");
-    if (scene) scene.hidden = reduceMotion;
   }
   applyMotion();
 
-  /* One name per discipline, used everywhere on the site. */
+  /* One short name per discipline, used everywhere. */
   const DISC = {
-    direction: {
-      name: "Art Direction & Set Design",
-      title: "Art Direction <em>&amp;</em> Set Design",
-      desc: "Developing visual concepts and directing the look, feel and composition of spaces, sets and imagery, from the first idea to the final image.",
-      tags: "Campaign sets · Props · Visual styling · Locations",
-      preview: "closer",
-    },
-    branding: {
-      name: "Branding & Creative Direction",
-      title: "Branding <em>&amp;</em> Creative Direction",
-      desc: "Building distinctive brand worlds through identity, strategy and art direction: one cohesive experience across every touchpoint.",
-      tags: "Identity · Packaging · Campaigns · Brand spaces",
-      preview: "colt-coffee",
-    },
-    scenography: {
-      name: "Scenography & Spatial Design",
-      title: "Scenography <em>&amp;</em> Spatial Design",
-      desc: "Designing immersive environments that turn stories into physical spaces through composition, atmosphere, materials and detail.",
-      tags: "Scenography · Locations · Interiors · 3D visualization",
-      preview: "haret-el-lamoun",
-    },
+    direction: { name: "Set design", preview: "closer" },
+    branding: { name: "Branding", preview: "colt-coffee" },
+    scenography: { name: "Scenography", preview: "haret-el-lamoun" },
   };
   const FEATURED = ["lavern", "colt-coffee", "bridge-to-terabithia"];
-
-  const JOBS = [
-    {
-      when: "2025 — Present",
-      role: "Creative Director & Partner",
-      org: "Vana Creative Studio",
-      short: "2025 — now",
-      desc: "I lead creative direction across branding, art direction, spatial design, set design and visual communication, from the first brief and research through execution, and coordinate with clients, designers and collaborators. Projects include COLT Coffee, Smile Café, CHAI, Marbat, Horse Park and Serj.",
-    },
-    {
-      when: "2020 — Present",
-      role: "Creative Director",
-      org: "Vana Room",
-      short: "2020 — now",
-      desc: "A local Egyptian home décor brand. I direct its visual direction, identity and creative language (product concepts, styling, packaging and visual communication) and contribute to positioning, product development and expansion.",
-    },
-    {
-      when: "2023 — 2026",
-      role: "Team Leader",
-      org: "Bab Ashra Art Space",
-      short: "2023 — 26",
-      desc: "Led and coordinated a multidisciplinary team of 45+ instructors and art assistants, managing workflow, scheduling and day-to-day creative operations for workshops and creative programs.",
-    },
-    {
-      when: "Early years — University",
-      role: "Creative & performance background",
-      org: "Theatre & Performing Arts",
-      short: "Early years",
-      desc: "Years of acting, singing, stage décor and set environments: the foundation for storytelling, stage composition, atmosphere and audience experience, and the reason I studied scenography.",
-    },
-  ];
 
   /* ---------- Helpers ---------- */
   const $ = (sel, el = document) => el.querySelector(sel);
   const $$ = (sel, el = document) => Array.from(el.querySelectorAll(sel));
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-  const pad = (n) => String(n).padStart(2, "0");
   const esc = (s) =>
     String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const bySlug = (slug) => PROJECTS.find((p) => p.slug === slug);
   const isArabic = (s) => /[؀-ۿ]/.test(s);
-  const txt = (s) => (isArabic(s) ? `<span lang="ar" dir="rtl">${esc(s)}</span>` : esc(s));
-  const shortType = (p) =>
-    ({ "Client project": "Client", "Academic project": "Academic", "Production concept": "Concept" })[p.type] ||
-    (p.type.startsWith("Graduation") ? "Graduation ’26" : p.type);
   const storage = {
-    get(k) {
-      try {
-        return localStorage.getItem(k);
-      } catch {
-        return null;
-      }
-    },
     set(k, v) {
       try {
         localStorage.setItem(k, v);
@@ -141,91 +77,25 @@
     return `<video class="lazy-video" muted loop playsinline preload="none" aria-label="${esc(label)}" poster="${poster}" data-src="${src}"></video>`;
   };
 
-  const leader = (k, v, { kSmall = "", vSmall = "", href = "" } = {}) => {
-    const tag = href ? "a" : "li";
-    const inner = `<span class="leader__k">${k}${kSmall ? `<small>${kSmall}</small>` : ""}</span><span class="leader__dots" aria-hidden="true"></span><span class="leader__v">${v}${
-      vSmall ? `<small>${vSmall}</small>` : ""
-    }</span>`;
-    return href ? `<li><${tag} class="leader" href="${href}">${inner}</${tag}></li>` : `<li class="leader">${inner}</li>`;
-  };
-
   /* ---------- Shared blocks ---------- */
-  const card = (p, i) => `
-    <a class="card" href="#/work/${p.slug}" data-d="${p.discipline}" data-cursor="View" data-reveal style="--d:${(i % 3) * 0.08}s">
-      <div class="card__media">
-        ${p.type === "Client project" ? "" : `<span class="tag card__tag">${esc(shortType(p))}</span>`}
-        ${pic(p.cover, { alt: `${p.title}, ${p.subtitle}`, sizes: "(max-width: 600px) 100vw, (max-width: 1100px) 50vw, 33vw", ws: [480, 800, 1200] })}
-        ${pic(p.hover, { alt: "", cls: "card__hover", sizes: "(max-width: 600px) 100vw, (max-width: 1100px) 50vw, 33vw", ws: [480, 800, 1200] })}
-      </div>
-      <div class="card__info">
-        <span class="label card__disc">${esc(DISC[p.discipline].name)}</span>
-        <h3 class="card__title">${esc(p.title)}<small>${txt(p.subtitle)}</small></h3>
-      </div>
-      <p class="card__sum">${esc(p.summary)}</p>
-    </a>`;
-
-  const row = (p, i) => `
-    <a class="row" href="#/work/${p.slug}" data-d="${p.discipline}" data-cursor="View" data-preview="${imgUrl(p.cover, 600)}" data-reveal style="--d:${Math.min(i, 6) * 0.04}s">
-      <span class="row__no label">${pad(i + 1)}</span>
-      <img class="row__thumb" src="${imgUrl(p.cover, 320)}" alt="" loading="lazy" decoding="async">
-      <span class="row__title">${esc(p.title)}<small>${txt(p.subtitle)}</small></span>
-      <span class="row__meta row__disc">${esc(DISC[p.discipline].name)}</span>
-      <span class="row__meta row__role">${esc(p.roles.join(", "))}</span>
-      <span class="row__type label">${esc(shortType(p))}</span>
-      <span class="row__arrow" aria-hidden="true">→</span>
-    </a>`;
-
   const contactHTML = () => `
-    <section class="contact section" id="contact" aria-labelledby="contact-title" data-scene="Contact">
-      <div class="wrap">
-        <p class="label eyebrow" data-reveal>Contact</p>
-        <div class="contact__grid">
-          <div>
-            <h2 id="contact-title" class="display contact__title" data-split>Have a brand, a set or a space <em>in mind?</em></h2>
-            <p class="contact__intro" data-reveal>Tell me a little about it, whether it’s a campaign, a café or a production, and let’s see what world it could become.</p>
-            <div class="contact__direct" data-reveal>
-              <div class="contact__line"><span class="label">Email</span><span class="contact__val"><a href="mailto:${EMAIL}">${EMAIL}</a> <button class="copy" data-copy="${EMAIL}" aria-label="Copy email address">Copy</button></span></div>
-              <div class="contact__line"><span class="label">Phone</span><a href="tel:${PHONE}">${PHONE_LABEL}</a></div>
-              <div class="contact__line"><span class="label">Instagram</span><a href="${INSTAGRAM}" target="_blank" rel="noopener">@selvanaessam ↗</a></div>
-              <div class="contact__line"><span class="label">Based in</span><span class="contact__val">Alexandria, Egypt</span></div>
-            </div>
-          </div>
-          <form class="form" id="brief" novalidate data-reveal style="--d:.15s">
-            <div>
-              <label for="f-name">Your name &amp; brand</label>
-              <input id="f-name" name="name" autocomplete="name" placeholder="e.g. Mona, Lavender Café" />
-            </div>
-            <fieldset>
-              <legend>What do you need?</legend>
-              <div class="types">
-                ${["Art direction", "Set design", "Branding", "Packaging", "Interior / space", "Scenography", "Something else"]
-                  .map((t) => `<button type="button" class="type" aria-pressed="false">${t}</button>`)
-                  .join("")}
-              </div>
-            </fieldset>
-            <div>
-              <label for="f-msg">Tell me about it</label>
-              <textarea id="f-msg" name="message" placeholder="The project, the timing, and anything I should know"></textarea>
-            </div>
-            <div class="form__actions">
-              <button class="btn btn--light" type="submit">Send by email <span class="arrow">→</span></button>
-              <a class="btn btn--ghost" id="waLink" href="https://wa.me/${WHATSAPP}" target="_blank" rel="noopener">Send on WhatsApp</a>
-            </div>
-            <p class="form__note">Opens your email app or WhatsApp with the brief already written, and copies it too. Nothing is stored on this site.</p>
-          </form>
+    <section class="section dark contact" id="contact" aria-labelledby="contact-title">
+      <div class="wrap contact__inner">
+        <h2 id="contact-title" class="title t-xl" data-split>Let’s make <em>something.</em></h2>
+        <a class="contact__mail" href="mailto:${EMAIL}" data-reveal>${EMAIL}</a>
+        <div class="contact__more" data-reveal>
+          <button type="button" data-copy="${EMAIL}">Copy email</button>
+          <a href="https://wa.me/${WHATSAPP}" target="_blank" rel="noopener">WhatsApp ↗</a>
+          <a href="tel:${PHONE}">${PHONE_LABEL}</a>
+          <a href="${INSTAGRAM}" target="_blank" rel="noopener">Instagram ↗</a>
         </div>
       </div>
     </section>`;
 
   /* ---------- Pages ---------- */
   function homeHTML() {
-    const names = ["LAVERN", "COLT Coffee", "Horse Park", "Marbat", "CHAI", "Smile Café", "Closer", "Re-Play"];
-    const track = names.map((n) => `<span class="marquee__item">${n}</span><span class="marquee__star" aria-hidden="true">✦</span>`).join("");
-    const count = (d) => PROJECTS.filter((p) => p.discipline === d).length;
-    const view = storage.get("selvana-view") === "grid" ? "grid" : "index";
-
     return `
-    <section class="stage" id="stage" aria-labelledby="hero-title" data-scene="The stage">
+    <section class="stage" id="stage" aria-labelledby="hero-title">
       <div class="stage__media" id="heroMedia">
         <picture>
           <source media="(max-width: 699px)" srcset="assets/stage-portrait.webp" />
@@ -239,103 +109,32 @@
       <div class="stage__fade" aria-hidden="true"></div>
       <div class="stage__grain" aria-hidden="true"></div>
       <div class="stage__inner wrap" id="heroContent">
-        <div class="stage__top" data-reveal>
-          <span class="label">Portfolio &amp; CV · 2026</span>
-          <span class="label">Alexandria, Egypt · 31.20° N 29.92° E</span>
-        </div>
-        <div class="stage__bottom">
-          <p class="stage__role" data-reveal style="--d:.1s">Creative Director for brands, stages and spaces</p>
-          <h1 id="hero-title" class="stage__name" data-split="chars" style="--d:.15s">Selvana <em>Essam</em></h1>
-          <div class="billing" data-reveal style="--d:.45s">
-            <p><small>art direction &amp;</small> Set Design <i>✦</i> <small>branding &amp;</small> Creative Direction <i>✦</i> Scenography <small>&amp; spatial design</small></p>
-            <p><small>creative director &amp; partner</small> Vana Creative Studio <i>✦</i> <small>since 2020</small> Vana Room <i>✦</i> <small>scenography, faculty of fine arts</small> 2026</p>
-          </div>
-          <nav class="stage__cues" aria-label="Start here" data-reveal style="--d:.6s">
-            <a class="cue" href="#/work">See the work <b>↓</b></a>
-            <a class="cue" href="#/cv">Read the CV</a>
-            <a class="cue" href="#/contact">Start a project</a>
-          </nav>
-        </div>
+        <h1 id="hero-title" class="stage__name" data-split="chars" style="--d:.1s">Selvana <em>Essam</em></h1>
+        <p class="stage__line" data-reveal style="--d:.7s">Creative director for brands, sets and spaces</p>
       </div>
     </section>
 
-    <section class="marquee" aria-label="Brands and productions: ${names.join(", ")}">
-      <span class="label marquee__label">With</span>
-      <div class="marquee__window">
-        <div class="marquee__track" aria-hidden="true">${track}</div>
-        ${reduceMotion ? "" : `<div class="marquee__track" aria-hidden="true">${track}</div>`}
+    <section class="section" aria-label="Approach">
+      <div class="wrap statement">
+        <h2 class="title" data-scrub>Theatre taught me that every space tells a story. Now I build those spaces for <em>brands.</em></h2>
+        <a class="link" href="#/cv" data-reveal>About me <span>→</span></a>
       </div>
     </section>
 
-    <section class="section" aria-labelledby="approach" data-scene="Programme note">
+    <section class="section dark" aria-labelledby="selected">
       <div class="wrap">
-        <p class="label eyebrow" data-reveal>Programme note</p>
-        <div class="note-grid">
-          <div>
-            <h2 id="approach" class="statement__text" data-scrub>Theatre taught me that every space tells a story. Now I bring that to brands, designing the <em>identity</em>, the <em>set</em> and the <em>room</em> people walk into.</h2>
-            <div class="sign" data-reveal><span class="sign__name">Selvana Essam</span><span class="label">Creative Director</span></div>
-          </div>
-          <div data-reveal style="--d:.1s">
-            <p class="label">Currently &amp; previously</p>
-            <ul class="leaders" style="margin-top:14px">
-              ${JOBS.slice(0, 3)
-                .map((j) => leader(esc(j.role), esc(j.org), { vSmall: j.short }))
-                .join("")}
-              ${leader("Scenography, Very Good with Honors", "Faculty of Fine Arts", { vSmall: "2026" })}
-            </ul>
-            <p style="margin-top:26px"><a class="link-arrow" href="#/cv">Read the full CV <span>→</span></a></p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section section--tight" aria-labelledby="services" style="padding-top:0" data-scene="What I do">
-      <div class="wrap">
-        <div class="section__head">
-          <div><p class="label eyebrow" data-reveal>What I do</p><h2 id="services" class="display h-lg" data-split>Three disciplines, <em>one story.</em></h2></div>
-        </div>
-        <div class="disc">
-          ${Object.entries(DISC)
-            .map(
-              ([key, d], i) => `
-            <a class="disc__row" href="#/work?d=${key}" data-disc="${key}" data-cursor="Explore" data-preview="${imgUrl(bySlug(d.preview).cover, 600)}" data-reveal style="--d:${i * 0.08}s">
-              <span class="disc__num label">0${i + 1}</span>
-              <h3 class="disc__title">${d.title}</h3>
-              <div class="disc__desc">${esc(d.desc)}<div class="disc__tags label">${esc(d.tags)}</div></div>
-              <span class="disc__go label">${count(key)} projects <b aria-hidden="true">→</b></span>
-              <div class="disc__thumbs" aria-hidden="true">${PROJECTS.filter((p) => p.discipline === key)
-                .map((p) => pic(p.cover, { sizes: "132px", ws: [320] }))
-                .join("")}</div>
-            </a>`
-            )
-            .join("")}
-        </div>
-      </div>
-    </section>
-
-    <section class="featured section" aria-labelledby="selected" data-scene="Selected work">
-      <div class="wrap">
-        <div class="section__head">
-          <div><p class="label eyebrow" data-reveal>Selected work</p><h2 id="selected" class="display h-lg" data-split>Three worlds, <em>start to finish.</em></h2></div>
-          <a class="link-arrow" href="#/work" data-reveal>All ${PROJECTS.length} projects <span>→</span></a>
+        <div class="head">
+          <h2 id="selected" class="small" data-reveal>Selected work</h2>
+          <a class="small link" href="#/work" data-reveal>All projects <span>→</span></a>
         </div>
         <div class="stack">
           ${FEATURED.map(bySlug)
             .map(
-              (p, i) => `
+              (p) => `
             <div class="stack__item">
               <a class="fcard" href="#/work/${p.slug}" data-cursor="View">
-                <div class="fcard__media">${
-                  p.video ? videoTag(p.video, 1280, `${p.title} campaign film`) : pic(p.cover, { alt: p.title, sizes: "(max-width: 860px) 100vw, 60vw" })
-                }</div>
-                <div class="fcard__body">
-                  <div>
-                    <span class="label fcard__num">${pad(i + 1)} / ${pad(FEATURED.length)}</span>
-                    <h3 class="fcard__title">${esc(p.title)}</h3>
-                    <p class="fcard__sub">${esc(p.summary)}</p>
-                  </div>
-                  <div class="fcard__meta"><span class="tag">${esc(DISC[p.discipline].name)}</span>${p.roles.map((r) => `<span class="tag">${esc(r)}</span>`).join("")}</div>
-                </div>
+                ${p.video ? videoTag(p.video, 1280, `${p.title} campaign film`) : pic(p.cover, { alt: p.title, sizes: "100vw" })}
+                <div class="fcard__caption"><h3 class="fcard__title">${esc(p.title)}</h3><span class="small">${esc(DISC[p.discipline].name)}</span></div>
                 <span class="fcard__dim"></span>
               </a>
             </div>`
@@ -345,61 +144,37 @@
       </div>
     </section>
 
-    <section class="section" id="work" aria-labelledby="all-work" data-scene="Index">
+    <section class="section" id="work" aria-labelledby="all-work">
       <div class="wrap">
-        <div class="section__head">
-          <div><p class="label eyebrow" data-reveal>Index</p><h2 id="all-work" class="display h-lg" data-split>All <em>work.</em></h2></div>
-        </div>
-        <div class="work-tools" data-reveal>
-          <div class="filters" role="group" aria-label="Filter projects by discipline">
-            <button class="filter" data-f="all" aria-pressed="true">All<sup>${PROJECTS.length}</sup></button>
+        <div class="head">
+          <h2 id="all-work" class="title t-lg" data-split>All projects</h2>
+          <div class="filters" role="group" aria-label="Filter projects" data-reveal>
+            <button class="filter" data-f="all" aria-pressed="true">All</button>
             ${Object.entries(DISC)
-              .map(([k, d]) => `<button class="filter" data-f="${k}" aria-pressed="false">${esc(d.name)}<sup>${count(k)}</sup></button>`)
+              .map(([k, d]) => `<button class="filter" data-f="${k}" aria-pressed="false">${d.name}</button>`)
               .join("")}
           </div>
-          <div class="views" role="group" aria-label="Layout">
-            <button class="view" data-view="index" aria-pressed="${view === "index"}">Index</button>
-            <button class="view" data-view="grid" aria-pressed="${view === "grid"}">Grid</button>
-          </div>
         </div>
-        <div class="index" id="index"${view === "index" ? "" : " hidden"}>${PROJECTS.map(row).join("")}</div>
-        <div class="grid" id="grid"${view === "grid" ? "" : " hidden"}>${PROJECTS.map(card).join("")}</div>
-      </div>
-    </section>
-
-    <section class="section section--tight" aria-labelledby="process" style="padding-top:0" data-scene="How a project runs">
-      <div class="wrap">
-        <div class="section__head">
-          <div><p class="label eyebrow" data-reveal>How a project runs</p><h2 id="process" class="display h-md" data-split>From the first brief <em>to opening night.</em></h2></div>
-        </div>
-        <div class="cues">
-          ${[
-            ["Listen & research", "Your brief, your audience and the story behind the brand. Research and references come first."],
-            ["Concept & moodboard", "One clear idea, shown through moodboards and visual direction you can react to early."],
-            ["Design & visualize", "The identity, set or space developed in detail, with 3D visualizations and technical drawings."],
-            ["Build & direct", "Working with makers, designers and crews to take it from drawing to the finished set."],
-          ]
-            .map(
-              ([t, d], i) =>
-                `<div class="cue-step" data-reveal style="--d:${i * 0.1}s"><span class="label cue-step__no">Cue ${pad(i + 1)}</span><h3>${t}</h3><p>${d}</p></div>`
-            )
-            .join("")}
+        <div class="list">
+          ${PROJECTS.map(
+            (p, i) => `
+            <a class="row" href="#/work/${p.slug}" data-d="${p.discipline}" data-cursor="View" data-preview="${imgUrl(p.cover, 600)}" data-reveal style="--d:${Math.min(i, 6) * 0.04}s">
+              <img class="row__thumb" src="${imgUrl(p.cover, 320)}" alt="" loading="lazy" decoding="async">
+              <span class="row__title">${esc(p.title)}</span>
+              <span class="row__meta">${esc(DISC[p.discipline].name)}</span>
+            </a>`
+          ).join("")}
         </div>
       </div>
     </section>
 
-    <section class="section" aria-labelledby="hello" style="padding-top:0" data-scene="About &amp; CV">
-      <div class="wrap teaser">
-        <figure class="teaser__img tilt" data-reveal="img"><img src="assets/portrait.webp" alt="Portrait of Selvana Essam on stage" loading="lazy" decoding="async" /></figure>
-        <div class="teaser__body">
-          <p class="label eyebrow" data-reveal>About &amp; CV</p>
-          <h2 id="hello" class="display h-lg" data-split>Hi, I’m <em>Selvana.</em></h2>
-          <p class="lead" data-reveal>A Creative Director and Art Director with a background in scenography.</p>
-          <p class="muted" data-reveal>I grew up on stage, acting, singing and building décor, then studied scenography at the Faculty of Fine Arts. Since 2020 I’ve directed brands like Vana Room, and today I’m Creative Director &amp; Partner at Vana Creative Studio.</p>
-          <div class="teaser__actions" data-reveal>
-            <a class="btn" href="#/cv">Read the CV <span class="arrow">→</span></a>
-            <a class="link-arrow" href="#/contact">Start a project <span>→</span></a>
-          </div>
+    <section class="section" aria-labelledby="hello" style="padding-top:0">
+      <div class="wrap about">
+        <figure class="about__img tilt" data-reveal="img"><img src="assets/portrait.webp" alt="Portrait of Selvana Essam on stage" loading="lazy" decoding="async" /></figure>
+        <div class="about__body">
+          <h2 id="hello" class="title t-lg" data-split>Hi, I’m <em>Selvana.</em></h2>
+          <p data-reveal>A creative director with a background in scenography. I lead Vana Creative Studio and have directed brands since 2020.</p>
+          <a class="link" href="#/cv" data-reveal>Read my CV <span>→</span></a>
         </div>
       </div>
     </section>
@@ -410,44 +185,30 @@
   function projectHTML(p) {
     const i = PROJECTS.indexOf(p);
     const next = PROJECTS[(i + 1) % PROJECTS.length];
-    const d = DISC[p.discipline];
     const portrait = p.slug === "closer" || p.slug === "lavern";
-    const total = p.gallery.length;
+    const arabic = isArabic(p.subtitle);
     let lbIndex = 0;
     const gallery = p.gallery
       .map((g, k) => {
-        const span = !portrait && k % 5 === 0 ? "g--full" : "";
-        const plate = `<span class="plate" aria-hidden="true">PL. ${pad(k + 1)} / ${pad(total)}</span>`;
+        const full = !portrait && k % 3 === 0;
         if (g.startsWith("video:")) {
-          return `<figure class="g ${span}" data-reveal="img">${videoTag(g.slice(6), 1280, `${p.title} film ${k + 1}`)}${plate}</figure>`;
+          return `<figure class="g${full ? " g--full" : ""}" data-reveal="img">${videoTag(g.slice(6), 1280, `${p.title} film ${k + 1}`)}</figure>`;
         }
-        const sizes = span ? "(max-width: 600px) 100vw, 1400px" : "(max-width: 600px) 100vw, 50vw";
-        return `<figure class="g ${span}" data-reveal="img" data-lb-i="${lbIndex++}" data-full="${imgUrl(g, 2000)}" data-cursor="Enlarge" tabindex="0" role="button" aria-label="Enlarge image ${k + 1} of ${esc(p.title)}">${pic(g, {
+        return `<figure class="g${full ? " g--full" : ""}" data-reveal="img" data-lb-i="${lbIndex++}" data-full="${imgUrl(g, 2000)}" data-cursor="Enlarge" tabindex="0" role="button" aria-label="Enlarge image ${k + 1} of ${esc(p.title)}">${pic(g, {
           alt: `${p.title}, image ${k + 1}`,
-          sizes,
-        })}${plate}</figure>`;
+          sizes: full ? "(max-width: 860px) 100vw, 1400px" : "(max-width: 860px) 100vw, 50vw",
+        })}</figure>`;
       })
       .join("");
 
     return `
     <article>
-      <header class="p-head" data-scene="The project">
+      <header class="p-head">
         <div class="wrap">
-          <nav class="crumbs label" aria-label="Breadcrumb" data-reveal>
-            <a href="#/work">← All work</a><span aria-hidden="true">/</span><a href="#/work?d=${p.discipline}">${esc(d.name)}</a>
-          </nav>
-          <h1 class="display p-title" data-split="chars">${esc(p.title)}</h1>
-          ${
-            isArabic(p.subtitle)
-              ? `<p class="ar-title" lang="ar" dir="rtl" data-reveal="ar">${esc(p.subtitle)}</p>`
-              : `<p class="label p-sub" data-reveal>${esc(p.subtitle)}</p>`
-          }
-          <dl class="p-meta" data-reveal>
-            <div><dt class="label">Role</dt><dd>${esc(p.roles.join(", "))}</dd></div>
-            <div><dt class="label">Discipline</dt><dd>${esc(d.name)}</dd></div>
-            <div><dt class="label">Type</dt><dd>${esc(p.type)}</dd></div>
-            <div><dt class="label">Similar project?</dt><dd><a class="link-arrow" href="#/contact">Let’s talk <span>→</span></a></dd></div>
-          </dl>
+          <a class="small" href="#/work" data-reveal>← All projects</a>
+          <h1 class="title t-xl p-title" data-split="chars">${esc(p.title)}</h1>
+          ${arabic ? `<p class="ar-title" lang="ar" dir="rtl" data-reveal="ar">${esc(p.subtitle)}</p>` : ""}
+          <p class="small p-meta" data-reveal>${esc(p.roles.join(", "))} · ${esc(arabic ? p.type : p.subtitle)}</p>
         </div>
       </header>
 
@@ -457,128 +218,92 @@
         }</figure>
       </div>
 
-      <section class="section section--tight" aria-label="About the project" data-scene="Credits &amp; scope">
+      <section class="section" aria-label="About the project">
         <div class="wrap p-story">
-          <aside class="p-story__aside">
-            <div data-reveal>
-              <p class="label">Credits</p>
-              <ul class="leaders" style="margin-top:14px">${p.roles.map((r) => leader(esc(r), "Selvana Essam")).join("")}</ul>
-            </div>
-            <div data-reveal>
-              <p class="label">Scope</p>
-              <ul class="scope">${p.scope.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>
-            </div>
-          </aside>
+          <div class="p-story__aside" data-reveal>
+            <p class="small">Scope</p>
+            <p>${esc(p.scope.join(", "))}</p>
+          </div>
           <div class="p-story__body">
             ${p.body.map((b, k) => `<p class="${k === 0 ? "lead" : ""}" data-reveal>${esc(b)}</p>`).join("")}
-            ${p.renders ? `<p class="note label" data-reveal>Includes 3D visualizations and concept renders</p>` : ""}
+            ${p.renders ? `<p class="small" data-reveal>Includes 3D visualizations and concept renders.</p>` : ""}
           </div>
         </div>
       </section>
 
-      <section class="section section--tight" aria-label="Gallery" style="padding-top:0" data-scene="Plates">
+      <section class="section" aria-label="Gallery" style="padding-top:0">
         <div class="wrap"><div class="gallery">${gallery}</div></div>
       </section>
 
-      <a class="next" href="#/work/${next.slug}" data-cursor="Next" data-scene="Next project">
+      <a class="next" href="#/work/${next.slug}" data-cursor="Next">
         <div class="next__bg">${pic(next.cover, { alt: "", sizes: "100vw" })}</div>
         <div class="wrap">
-          <p class="label eyebrow">Next project · ${esc(DISC[next.discipline].name)}</p>
-          <h2 class="display next__title">${esc(next.title)} <span aria-hidden="true">→</span></h2>
+          <p class="small">Next project</p>
+          <h2 class="title t-xl">${esc(next.title)}</h2>
         </div>
       </a>
-    </article>
-    ${contactHTML()}`;
+    </article>`;
   }
 
   function cvHTML() {
+    const jobs = [
+      ["2025 — now", "Creative Director & Partner, Vana Creative Studio", "Creative direction across branding, art direction, spatial and set design, from brief to execution. Projects include COLT Coffee, Smile Café, CHAI, Marbat and Horse Park."],
+      ["2020 — now", "Creative Director, Vana Room", "Visual direction, identity, product styling and packaging for an Egyptian home décor brand."],
+      ["2023 — 2026", "Team Leader, Bab Ashra Art Space", "Led a team of 45+ instructors and art assistants across workshops and creative programs."],
+      ["Early years", "Theatre & performing arts", "Years of acting, singing and building stage décor led me to study scenography."],
+    ];
     const skills = [
-      ["Creative Direction", "Creative strategy, concept development, art direction, visual storytelling, brand direction"],
-      ["Branding", "Brand identity, brand development, packaging, campaign direction, product styling, brand experience"],
-      ["Spatial & Scenography", "Set design, scenography, spatial design, interior & exterior design, environmental design, 3D visualization"],
-      ["Leadership", "Creative team leadership, project management, client communication, creative operations, presentation & pitching"],
-      ["3D & Visualization", "3ds Max, V-Ray, Unreal Engine"],
-      ["Design & Technical", "Photoshop, Illustrator, InDesign, AutoCAD, Canva"],
-      ["Interactive / Experiential", "TouchDesigner, Resolume Arena, MadMapper"],
+      ["Direction", "Creative strategy, concept development, art direction, visual storytelling"],
+      ["Branding", "Identity, packaging, campaign direction, product styling"],
+      ["Space", "Set design, scenography, interior and exterior design, 3D visualization"],
+      ["Tools", "3ds Max, V-Ray, Unreal Engine, AutoCAD, Photoshop, Illustrator, InDesign, TouchDesigner, Resolume, MadMapper"],
       ["Languages", "Arabic (native), English (upper-intermediate)"],
     ];
+    const rows = (list, plain = false) =>
+      list
+        .map(
+          ([a, b, c]) =>
+            `<div class="cv-row" data-reveal><span class="small">${a}</span><div>${plain ? `<p>${esc(b)}</p>` : `<h3>${esc(b)}</h3>`}${c ? `<p>${esc(c)}</p>` : ""}</div></div>`
+        )
+        .join("");
     return `
-    <section class="cv-head" aria-labelledby="cv-title" data-scene="About &amp; CV">
+    <section class="cv-head" aria-labelledby="cv-title">
       <div class="wrap cv-head__grid">
-        <div>
-          <p class="label eyebrow" data-reveal>About &amp; CV</p>
-          <h1 id="cv-title" class="display cv-title" data-split="chars">Selvana <em>Essam</em></h1>
-          <p class="cv-role" data-reveal>Creative Director · Art Director · Scenographer</p>
-          <dl class="facts" data-reveal>
-            <div><dt class="label">Based in</dt><dd>Alexandria, Egypt</dd></div>
-            <div><dt class="label">Now</dt><dd>Creative Director &amp; Partner, Vana Creative Studio</dd></div>
-            <div><dt class="label">Studied</dt><dd>Scenography, Faculty of Fine Arts, 2026 (Very Good with Honors)</dd></div>
-            <div><dt class="label">Contact</dt><dd>${EMAIL} · ${PHONE_LABEL}</dd></div>
-          </dl>
+        <div class="cv-head__body">
+          <p class="small" data-reveal>About</p>
+          <h1 id="cv-title" class="title t-xl" data-split="chars">Selvana <em>Essam</em></h1>
+          <p class="lead" data-reveal>Creative director, art director and scenographer in Alexandria, Egypt.</p>
+          <p data-reveal>Theatre and scenography shape how I design: around story, atmosphere and the people who walk into a space. I take ideas from research to the finished set, for brands, cultural spaces and productions.</p>
           <div class="cv-actions" data-reveal>
-            <button class="btn print-btn" type="button" data-print>Download CV (PDF) <span class="arrow">↓</span></button>
-            <a class="btn btn--ghost" href="#/contact">Start a project</a>
+            <button class="btn print-btn" type="button" data-print>Download CV <span aria-hidden="true">↓</span></button>
+            <a class="btn btn--ghost" href="#/contact">Get in touch</a>
           </div>
         </div>
         <figure class="cv-head__img tilt" data-reveal="img"><img src="assets/portrait.webp" alt="Portrait of Selvana Essam on stage" decoding="async" /></figure>
       </div>
     </section>
 
-    <section class="section section--tight" aria-label="Practice" style="padding-top:0">
-      <div class="wrap pillars">
-        ${[
-          ["Practice", "A multidisciplinary Creative Director and Art Director with a background in scenography, set design, spatial design, branding and visual storytelling."],
-          ["From research to execution", "Across studios, brands, cultural spaces and productions, I take concepts from research and narrative into cohesive identities, physical environments and immersive experiences."],
-          ["Storytelling and space", "Theatre and scenography shaped how I design: around story, atmosphere, space and the experience of the audience."],
-        ]
-          .map(([t, d], i) => `<div class="pillar" data-reveal style="--d:${i * 0.1}s"><h3>${t}</h3><p>${d}</p></div>`)
-          .join("")}
-      </div>
-    </section>
-
-    <section class="section section--tight" aria-labelledby="exp" data-scene="Experience">
-      <div class="wrap">
-        <div class="section__head"><div><p class="label eyebrow" data-reveal>Experience</p><h2 id="exp" class="display h-md" data-split>Where I’ve <em>worked.</em></h2></div></div>
-        <div class="credits">
-          ${JOBS.map(
-            (j) =>
-              `<div class="credit" data-reveal><span class="credit__when label">${j.when}</span><div><h3 class="credit__role">${esc(j.role)}</h3><p class="credit__org">${esc(j.org)}</p></div><p class="credit__desc">${esc(j.desc)}</p></div>`
-          ).join("")}
-          <div class="credit" data-reveal><span class="credit__when label">Graduated 2026</span><div><h3 class="credit__role">Scenography, Very Good with Honors</h3><p class="credit__org">Faculty of Fine Arts</p></div><p class="credit__desc">Graduation project: <a class="link-btn" href="#/work/bridge-to-terabithia">Bridge to Terabithia</a>. Focus on scenography, set design, spatial storytelling and visual world-building.</p></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section section--tight" aria-labelledby="credits" data-scene="Selected credits">
-      <div class="wrap">
-        <div class="section__head"><div><p class="label eyebrow" data-reveal>Selected credits</p><h2 id="credits" class="display h-md" data-split>Twelve <em>productions.</em></h2></div></div>
-        <ul class="leaders" data-reveal>
-          ${PROJECTS.map((p) => leader(esc(p.title), esc(p.roles.join(", ")), { kSmall: txt(p.subtitle), vSmall: `${DISC[p.discipline].name} · ${shortType(p)}`, href: `#/work/${p.slug}` })).join("")}
-        </ul>
-      </div>
-    </section>
-
-    <section class="section section--tight" aria-labelledby="skills" data-scene="Expertise &amp; tools">
-      <div class="wrap">
-        <div class="section__head"><div><p class="label eyebrow" data-reveal>Expertise &amp; tools</p><h2 id="skills" class="display h-md" data-split>What I <em>bring.</em></h2></div></div>
-        <div class="skills">${skills.map(([t, d]) => `<div class="skill" data-reveal><h3 class="label">${t}</h3><p>${d}</p></div>`).join("")}</div>
-      </div>
+    <section class="wrap" aria-label="CV" style="padding-bottom:clamp(64px, 9vw, 120px)">
+      <div class="cv-block"><h2 data-reveal>Experience</h2><div class="cv-rows">${rows(jobs)}</div></div>
+      <div class="cv-block"><h2 data-reveal>Education</h2><div class="cv-rows">${rows([
+        ["2026", "Scenography, Faculty of Fine Arts", "Very Good with Honors. Graduation project: Bridge to Terabithia."],
+      ])}</div></div>
+      <div class="cv-block"><h2 data-reveal>Skills</h2><div class="cv-rows">${rows(skills, true)}</div></div>
     </section>
 
     ${contactHTML()}`;
   }
 
   const notFoundHTML = () => `
-    <section class="cv-head"><div class="wrap">
-      <p class="label eyebrow">404</p>
-      <h1 class="display cv-title">This scene <em>isn’t built yet.</em></h1>
-      <p style="margin-top:28px"><a class="btn" href="#/">Back to the stage <span class="arrow">→</span></a></p>
+    <section class="cv-head"><div class="wrap cv-head__body">
+      <h1 class="title t-xl">This scene <em>isn’t built yet.</em></h1>
+      <a class="btn" href="#/">Back to the stage</a>
     </div></section>`;
 
   /* ---------- Router ---------- */
   const view = $("#view");
   const header = $("#header");
-  let current = null; // { key, kind }
+  let current = null;
   let firstRender = true;
   let navigating = false;
 
@@ -600,8 +325,8 @@
   }
 
   const TITLES = {
-    home: "Selvana Essam — Creative Director · Portfolio & CV",
-    cv: "About & CV — Selvana Essam, Creative Director",
+    home: "Selvana Essam — Creative Director",
+    cv: "About — Selvana Essam",
     404: "Not found — Selvana Essam",
   };
 
@@ -611,9 +336,7 @@
     else if (route.kind === "project") view.innerHTML = projectHTML(route.project);
     else if (route.kind === "cv") view.innerHTML = cvHTML();
     else view.innerHTML = notFoundHTML();
-
-    document.title = route.kind === "project" ? `${route.project.title} — ${route.project.subtitle} · Selvana Essam` : TITLES[route.kind];
-    document.body.dataset.page = route.kind;
+    document.title = route.kind === "project" ? `${route.project.title} — Selvana Essam` : TITLES[route.kind];
     updateNav(route);
     current = route;
     initPage(route);
@@ -635,9 +358,7 @@
     if (route.target) {
       const el = $(route.target);
       if (el) {
-        const anchor = route.target === "#work" ? $(".section__head", el) : el;
-        const offset = route.target === "#work" ? header.offsetHeight + 24 : 0;
-        const y = anchor.getBoundingClientRect().top + window.scrollY - offset;
+        const y = el.getBoundingClientRect().top + window.scrollY - (route.target === "#work" ? header.offsetHeight : 0);
         window.scrollTo({ top: y, behavior: smooth && !reduceMotion ? "smooth" : "auto" });
         return;
       }
@@ -648,7 +369,6 @@
   async function navigate() {
     const route = parseRoute();
     closeMenu();
-
     if (firstRender) {
       firstRender = false;
       render(route);
@@ -656,7 +376,6 @@
       playIntro(route);
       return;
     }
-    // Same page (e.g. Home → Work section): just move, no curtain.
     if (current && route.key === current.key) {
       current = route;
       updateNav(route);
@@ -669,7 +388,7 @@
     navigating = true;
     const curtain = $("#curtain");
     $(".curtain__mark", curtain).textContent =
-      route.kind === "project" ? route.project.title : route.kind === "cv" ? "About & CV" : route.target === "#contact" ? "Contact" : "Selvana";
+      route.kind === "project" ? route.project.title : route.kind === "cv" ? "About" : route.target === "#contact" ? "Contact" : "Selvana";
     if (!reduceMotion) {
       curtain.classList.remove("is-up");
       curtain.classList.add("is-down");
@@ -712,7 +431,7 @@
   window.addEventListener("popstate", fromLocation);
   window.addEventListener("hashchange", fromLocation);
 
-  /* ---------- First-visit intro: the curtain rises ---------- */
+  /* ---------- Intro: the curtain rises on every visit to the homepage ---------- */
   function playIntro(route) {
     const intro = $("#intro");
     const heroContent = $("#heroContent");
@@ -727,13 +446,12 @@
     const count = $("#introCount");
     const t0 = performance.now();
     let counting = true;
-    const tickCount = (t) => {
+    const tick = (t) => {
       if (!counting) return;
-      const k = clamp((t - t0) / 1300, 0, 0.99);
-      count.textContent = String(Math.round(k * 100)).padStart(3, "0");
-      requestAnimationFrame(tickCount);
+      count.textContent = String(Math.round(clamp((t - t0) / 1300, 0, 0.99) * 100)).padStart(3, "0");
+      requestAnimationFrame(tick);
     };
-    requestAnimationFrame(tickCount);
+    requestAnimationFrame(tick);
     Promise.all([Promise.race([ready, wait(1600)]), wait(1300)]).then(() => {
       counting = false;
       count.textContent = "100";
@@ -785,27 +503,6 @@
     if (chars) el.classList.add("split--chars");
   }
 
-  // Labels decode like a typewriter as they appear.
-  const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/·";
-  function scramble(el) {
-    if (el.dataset.scrambled || reduceMotion) return;
-    el.dataset.scrambled = "1";
-    const final = el.textContent;
-    const total = 20;
-    let f = 0;
-    const id = setInterval(() => {
-      f++;
-      const solved = Math.floor((f / total) * final.length);
-      el.textContent = Array.from(final)
-        .map((c, k) => (k < solved || c === " " ? c : GLYPHS[(Math.random() * GLYPHS.length) | 0]))
-        .join("");
-      if (f >= total) {
-        clearInterval(id);
-        el.textContent = final;
-      }
-    }, 32);
-  }
-
   function revealNow(scope) {
     requestAnimationFrame(() =>
       requestAnimationFrame(() => $$("[data-reveal], [data-split]", scope).forEach((el) => el.classList.add("is-in")))
@@ -820,7 +517,6 @@
         entries.forEach((e) => {
           if (e.isIntersecting) {
             e.target.classList.add("is-in");
-            if (e.target.classList.contains("eyebrow")) scramble(e.target);
             io.unobserve(e.target);
           }
         }),
@@ -832,27 +528,7 @@
     });
   }
 
-  // Link text rolls up on hover: the visible label slides away and a copy rises in.
-  function rollify(scope) {
-    $$(".nav a, .cue, .header__cta, .link-arrow, .footer__cols a", scope).forEach((el) => {
-      if (el.dataset.rolled) return;
-      const t = Array.from(el.childNodes).find((n) => n.nodeType === 3 && n.textContent.trim());
-      if (!t) return;
-      el.dataset.rolled = "1";
-      const text = t.textContent.trim();
-      const wrap = document.createElement("span");
-      wrap.className = "roll";
-      const inner = document.createElement("span");
-      inner.textContent = text;
-      inner.dataset.text = text;
-      wrap.appendChild(inner);
-      const lead = t.textContent.match(/^\s*/)[0];
-      const trail = t.textContent.match(/\s*$/)[0];
-      t.replaceWith(document.createTextNode(lead), wrap, document.createTextNode(trail));
-    });
-  }
-
-  /* Programme note: words light up as you read down the page. */
+  /* The approach sentence lights up word by word as you read. */
   let scrubWords = [];
   let scrubEl = null;
   function initScrub() {
@@ -869,6 +545,7 @@
             else {
               const s = document.createElement("span");
               s.className = "sw";
+              s.style.transition = "opacity .25s linear";
               s.textContent = part;
               frag.appendChild(s);
             }
@@ -909,12 +586,12 @@
     vids.forEach((v) => vio.observe(v));
   }
 
-  /* ---------- Work: filter + index/grid view ---------- */
+  /* ---------- Project filter ---------- */
   function applyFilter(f, animate = true) {
     const work = $("#work", view);
     if (!work) return;
     $$(".filter", work).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.f === f)));
-    const items = $$(".card, .row", work);
+    const items = $$(".row", work);
     const show = (c) => f === "all" || c.dataset.d === f;
     if (!animate || reduceMotion) {
       items.forEach((c) => {
@@ -935,20 +612,10 @@
           requestAnimationFrame(() => requestAnimationFrame(() => c.classList.remove("is-out")));
         }
       });
-    }, 320);
+    }, 300);
   }
 
-  function setView(v) {
-    const index = $("#index", view);
-    const grid = $("#grid", view);
-    if (!index || !grid) return;
-    index.hidden = v !== "index";
-    grid.hidden = v !== "grid";
-    $$(".view", view).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
-    storage.set("selvana-view", v);
-  }
-
-  /* ---------- Floating preview (lists) ---------- */
+  /* ---------- Floating preview over the project list ---------- */
   let floatPreview = null;
   const fp = { x: 0, y: 0, tx: 0, ty: 0, on: false };
   function showPreview(src, e) {
@@ -978,14 +645,6 @@
     fp.on = false;
     floatPreview?.classList.remove("is-on");
   }
-  if (finePointer) {
-    document.addEventListener("mouseover", (e) => {
-      if (reduceMotion) return;
-      const t = e.target.closest("[data-preview]");
-      if (t) showPreview(t.dataset.preview, e);
-      else if (fp.on) hidePreview();
-    });
-  }
 
   /* ---------- Lightbox ---------- */
   const lb = $("#lightbox");
@@ -1008,7 +667,7 @@
           if (b.width) {
             const dx = a.left + a.width / 2 - (b.left + b.width / 2);
             const dy = a.top + a.height / 2 - (b.top + b.height / 2);
-            im.animate([{ transform: `translate(${dx}px, ${dy}px) scale(${a.width / b.width})`, opacity: 0.85 }, { transform: "none", opacity: 1 }], {
+            im.animate([{ transform: `translate(${dx}px, ${dy}px) scale(${a.width / b.width})` }, { transform: "none" }], {
               duration: 750,
               easing: "cubic-bezier(.16,1,.3,1)",
             });
@@ -1018,7 +677,7 @@
       });
     if (im.complete) done();
     else im.addEventListener("load", done, { once: true });
-    lbCount.textContent = `PL. ${pad(lbIdx + 1)} / ${pad(lbItems.length)}`;
+    lbCount.textContent = `${lbIdx + 1} / ${lbItems.length}`;
   }
   function lbOpen(i) {
     lbItems = $$("[data-lb-i]", view);
@@ -1082,12 +741,12 @@
 
   /* ---------- Toast ---------- */
   let toastT = 0;
-  function toast(msg, ms = 2200) {
+  function toast(msg) {
     const t = $("#toast");
     t.textContent = msg;
     t.classList.add("is-on");
     clearTimeout(toastT);
-    toastT = setTimeout(() => t.classList.remove("is-on"), ms);
+    toastT = setTimeout(() => t.classList.remove("is-on"), 2200);
   }
 
   /* ---------- Delegated interactions ---------- */
@@ -1105,22 +764,10 @@
       current = parseRoute();
       return;
     }
-    const v = e.target.closest(".view");
-    if (v) {
-      setView(v.dataset.view);
-      return;
-    }
-    const type = e.target.closest(".type");
-    if (type) {
-      type.setAttribute("aria-pressed", String(type.getAttribute("aria-pressed") !== "true"));
-      syncWhatsApp(type.closest("form"));
-      return;
-    }
     const copy = e.target.closest("[data-copy]");
     if (copy) {
       const value = copy.dataset.copy;
-      const ok = () => toast("Email copied");
-      if (navigator.clipboard) navigator.clipboard.writeText(value).then(ok, () => toast(value));
+      if (navigator.clipboard) navigator.clipboard.writeText(value).then(() => toast("Email copied"), () => toast(value));
       else toast(value);
       return;
     }
@@ -1142,42 +789,6 @@
     const g = e.target.closest("[data-lb-i]");
     if (g) lbOpen(Number(g.dataset.lbI));
   });
-
-  document.addEventListener("submit", (e) => {
-    if (e.target.id !== "brief") return;
-    e.preventDefault();
-    const { subject, body } = buildBrief(e.target);
-    const copied = () => toast(`Brief copied. If no email app opened, paste it into an email to ${EMAIL}`, 5000);
-    if (navigator.clipboard) navigator.clipboard.writeText(`To: ${EMAIL}\nSubject: ${subject}\n\n${body}`).then(copied, () => {});
-    location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  });
-  document.addEventListener("input", (e) => {
-    const form = e.target.closest("#brief");
-    if (form) syncWhatsApp(form);
-  });
-  function syncWhatsApp(form) {
-    const link = $("#waLink", form);
-    if (link) link.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(buildBrief(form).body)}`;
-  }
-
-  function buildBrief(form) {
-    const name = form.elements.name.value.trim();
-    const msg = form.elements.message.value.trim();
-    const types = $$(".type[aria-pressed='true']", form).map((b) => b.textContent);
-    const body = [
-      "Hi Selvana,",
-      "",
-      msg || "I’d love to talk about a project.",
-      "",
-      types.length ? `What I need: ${types.join(", ")}` : "",
-      name ? `— ${name}` : "",
-    ]
-      .join("\n")
-      .replace(/\n{3,}/g, "\n\n")
-      .trim();
-    const subject = `New project${types.length ? ` — ${types.join(", ")}` : ""}${name ? ` — ${name}` : ""}`;
-    return { subject, body };
-  }
 
   document.addEventListener("keydown", (e) => {
     if (!lb.hidden) {
@@ -1206,10 +817,8 @@
     window.addEventListener(
       "mousemove",
       (e) => {
-        cur.tx = e.clientX;
-        cur.ty = e.clientY;
-        fp.tx = e.clientX;
-        fp.ty = e.clientY;
+        cur.tx = fp.tx = e.clientX;
+        cur.ty = fp.ty = e.clientY;
         const stage = $("#stage", view);
         if (stage) {
           const r = stage.getBoundingClientRect();
@@ -1219,21 +828,44 @@
             spot.ty = ((e.clientY - r.top) / r.height) * 100;
           }
         }
+        if (reduceMotion) return;
+        // Buttons lean toward the pointer; portraits and covers tilt in 3D.
+        const m = e.target.closest(".btn");
+        const tiltEl = e.target.closest(".tilt");
+        $$(".is-pulled, .is-tilted").forEach((el) => {
+          if (el !== m && el !== tiltEl) {
+            el.classList.remove("is-pulled", "is-tilted");
+            el.style.transform = "";
+          }
+        });
+        if (m) {
+          const r = m.getBoundingClientRect();
+          m.classList.add("is-pulled");
+          m.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.16}px, ${(e.clientY - r.top - r.height / 2) * 0.28}px)`;
+        }
+        if (tiltEl) {
+          const r = tiltEl.getBoundingClientRect();
+          tiltEl.classList.add("is-tilted");
+          tiltEl.style.transform = `perspective(1000px) rotateY(${(((e.clientX - r.left) / r.width - 0.5) * 6).toFixed(2)}deg) rotateX(${(-((e.clientY - r.top) / r.height - 0.5) * 6).toFixed(2)}deg)`;
+        }
       },
       { passive: true }
     );
     document.addEventListener("mouseover", (e) => {
+      if (reduceMotion) return;
       const media = e.target.closest("[data-cursor]");
-      const link = !media && e.target.closest("a, button, [role='button'], label");
+      const link = !media && e.target.closest("a, button, [role='button']");
       const field = e.target.closest("input, textarea");
-      const onStage = !media && !link && e.target.closest("#stage");
       ring.classList.toggle("is-media", Boolean(media));
       dot.classList.toggle("is-media", Boolean(media));
       ring.classList.toggle("is-link", Boolean(link));
-      ring.classList.toggle("is-stage", Boolean(onStage));
+      ring.classList.toggle("is-stage", Boolean(!media && !link && e.target.closest("#stage")));
       ring.classList.toggle("is-hidden", Boolean(field));
       dot.classList.toggle("is-hidden", Boolean(field));
       ringLabel.textContent = media ? media.dataset.cursor : "";
+      const pv = e.target.closest("[data-preview]");
+      if (pv) showPreview(pv.dataset.preview, e);
+      else if (fp.on) hidePreview();
     });
     window.addEventListener("mousedown", () => ring.classList.add("is-down"));
     window.addEventListener("mouseup", () => ring.classList.remove("is-down"));
@@ -1246,56 +878,17 @@
       dot.classList.remove("is-hidden");
       ring.classList.remove("is-hidden");
     });
-
-    document.addEventListener(
-      "mousemove",
-      (e) => {
-        if (reduceMotion) return;
-        const m = e.target.closest(".btn, .cue, .header__cta");
-        const tiltEl = e.target.closest(".tilt");
-        $$(".tilt.is-tilted").forEach((el) => {
-          if (el !== tiltEl) {
-            el.classList.remove("is-tilted");
-            el.style.transform = "";
-          }
-        });
-        if (tiltEl) {
-          const tr = tiltEl.getBoundingClientRect();
-          const px = (e.clientX - tr.left) / tr.width - 0.5;
-          const py = (e.clientY - tr.top) / tr.height - 0.5;
-          tiltEl.classList.add("is-tilted");
-          tiltEl.style.transform = `perspective(1000px) rotateY(${(px * 7).toFixed(2)}deg) rotateX(${(-py * 7).toFixed(2)}deg)`;
-        }
-        $$(".is-pulled").forEach((el) => {
-          if (el !== m) {
-            el.classList.remove("is-pulled");
-            el.style.transform = "";
-          }
-        });
-        if (!m) return;
-        const r = m.getBoundingClientRect();
-        const dx = e.clientX - (r.left + r.width / 2);
-        const dy = e.clientY - (r.top + r.height / 2);
-        m.classList.add("is-pulled");
-        m.style.transform = `translate(${dx * 0.16}px, ${dy * 0.28}px)`;
-      },
-      { passive: true }
-    );
   }
 
-  /* ---------- Scroll- and pointer-driven motion (one rAF loop) ---------- */
-  let lastY = window.scrollY;
-  let marqueeRate = 1;
-  let marqueeDir = 1;
-  let skew = 0;
-  let sceneName = "";
+  /* ---------- Stage dust: specks drifting through the spotlight ---------- */
   const dust = { el: null, ctx: null, w: 0, h: 0, dpr: 1, parts: [] };
   function setupDust() {
     dust.el = $("#dust", view);
+    dust.ctx = null;
     if (!dust.el) return;
     dust.ctx = dust.el.getContext("2d");
     sizeDust();
-    dust.parts = Array.from({ length: 110 }, () => ({
+    dust.parts = Array.from({ length: 100 }, () => ({
       x: Math.random() * dust.w,
       y: Math.random() * dust.h,
       r: (0.5 + Math.random() * 1.7) * dust.dpr,
@@ -1335,33 +928,16 @@
     }
     ctx.globalAlpha = 1;
   }
-  function updateScene(vh) {
-    const el = $("#scene");
-    if (!el || reduceMotion) return;
-    const scenes = $$("[data-scene]", view);
-    let idx = -1;
-    scenes.forEach((s, i) => {
-      const r = s.getBoundingClientRect();
-      if (r.top <= vh * 0.5 && r.bottom > vh * 0.5) idx = i;
-    });
-    const name = idx >= 0 ? `Scene ${pad(idx + 1)} · ${scenes[idx].dataset.scene}` : "";
-    if (name === sceneName) return;
-    sceneName = name;
-    el.classList.add("is-swap");
-    setTimeout(() => {
-      $("span", el).textContent = name;
-      el.classList.remove("is-swap");
-    }, 250);
-  }
 
+  /* ---------- One animation loop for scroll and pointer motion ---------- */
+  let lastY = window.scrollY;
   function frame(t) {
     const y = window.scrollY;
-    const v = y - lastY;
     const vh = window.innerHeight;
     const page = current ? current.kind : "home";
     const menuOpen = document.body.classList.contains("menu-open");
 
-    // Header: transparent over the stage, solid everywhere else, hides while scrolling down.
+    // Header: transparent over the stage, solid elsewhere, hides while scrolling down.
     const stage = page === "home" ? $("#stage", view) : null;
     const overStage = stage && y < stage.offsetHeight - header.offsetHeight;
     header.classList.toggle("on-dark", Boolean(overStage) && !menuOpen);
@@ -1372,7 +948,6 @@
     }
     lastY = y;
 
-    // Reading progress on project pages.
     const prog = $("#progress");
     if (page === "project") {
       const max = document.documentElement.scrollHeight - vh;
@@ -1380,23 +955,7 @@
     } else prog.style.transform = "scaleX(0)";
 
     if (!reduceMotion) {
-      // Brand ticker speeds up with scrolling and runs backwards when you scroll up.
-      if (v) marqueeDir = v > 0 ? 1 : -1;
-      marqueeRate += (marqueeDir * (1 + Math.min(Math.abs(v) * 0.15, 6)) - marqueeRate) * 0.08;
-      $$(".marquee__track", view).forEach((tr) => {
-        const a = tr.getAnimations ? tr.getAnimations()[0] : null;
-        if (a) a.playbackRate = marqueeRate;
-      });
-
-      // Images lean slightly with scroll speed.
-      if (finePointer) {
-        skew += (clamp(v * 0.05, -3, 3) - skew) * 0.12;
-        root.style.setProperty("--skew", `${skew.toFixed(3)}deg`);
-      }
-
-      updateScene(vh);
-
-      // Stage: parallax, and a spotlight that follows the pointer (or drifts on touch screens).
+      // Stage: parallax and a spotlight that follows the pointer (or drifts on touch screens).
       if (stage && y < vh * 1.2) {
         const media = $("#heroMedia", view);
         if (media) media.style.transform = `translate3d(0, ${y * 0.28}px, 0)`;
@@ -1411,15 +970,14 @@
         drawDust(t);
       }
 
-      // Programme note words.
       if (scrubEl && scrubWords.length) {
         const r = scrubEl.getBoundingClientRect();
         const p = clamp((vh * 0.82 - r.top) / (r.height + vh * 0.25));
         const n = Math.round(p * scrubWords.length);
-        scrubWords.forEach((w, i) => w.classList.toggle("on", i < n));
+        scrubWords.forEach((w, i) => (w.style.opacity = i < n ? "1" : "0.16"));
       }
 
-      // Featured stack: earlier cards sink back as the next one arrives.
+      // Selected work: earlier cards sink back as the next one arrives.
       if (window.innerWidth > 860) {
         const items = $$(".stack__item", view);
         items.forEach((it, i) => {
@@ -1428,13 +986,12 @@
           if (!nextIt) return;
           const h = fc.offsetHeight;
           const p = clamp((it.getBoundingClientRect().top + h - nextIt.getBoundingClientRect().top) / h);
-          fc.style.transform = `scale(${1 - p * 0.08})`;
+          fc.style.transform = `scale(${1 - p * 0.07})`;
           const dim = $(".fcard__dim", fc);
           if (dim) dim.style.opacity = String(p * 0.55);
         });
       }
 
-      // Cursor (dot is quick, ring trails) and list preview follow with easing.
       if (finePointer) {
         cur.x += (cur.tx - cur.x) * 0.5;
         cur.y += (cur.ty - cur.y) * 0.5;
@@ -1448,7 +1005,7 @@
           fp.y += (fp.ty - fp.y) * 0.14;
           floatPreview.style.left = `${fp.x}px`;
           floatPreview.style.top = `${fp.y}px`;
-          floatPreview.style.transform = `translate(-50%, -50%) scale(1) rotate(${(-3 + clamp(vx * 0.06, -12, 12)).toFixed(2)}deg)`;
+          floatPreview.style.transform = `translate(-50%, -50%) scale(1) rotate(${clamp(vx * 0.05, -10, 10).toFixed(2)}deg)`;
         } else if (floatPreview && floatPreview.style.transform) floatPreview.style.transform = "";
       }
     }
@@ -1465,29 +1022,14 @@
   }
 
   function initPage(route) {
-    sceneName = "";
     initScrub();
     initReveals();
     initVideos();
-    rollify(view);
     setupDust();
     if (route.kind === "home") {
       const f = route.params.get("d");
       if (f && DISC[f]) applyFilter(f, false);
     }
-  }
-
-  rollify(document);
-  const footMark = $(".footer__mark");
-  if (footMark && !reduceMotion) {
-    splitWords(footMark);
-    const fio = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        footMark.classList.add("is-in");
-        fio.disconnect();
-      }
-    });
-    fio.observe(footMark);
   }
 
   navigate();
