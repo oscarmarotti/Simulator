@@ -43,9 +43,22 @@ Selvana's story starts in theatre, so the site reads like a stage show and its p
   - Over links the ring grows. Over images it becomes a velvet disc that says what will happen (*View*, *Explore*, *Enlarge*, *Next*), and it shrinks briefly on click.
   - On the stage the ring widens to the edge of the spotlight. Text fields keep the normal text cursor.
 - **Styling.** Buttons and labels are square-cornered and set in a drafting-style monospace, like annotations on a technical drawing, instead of rounded "app" pills.
-- **Reduced motion.** With reduced motion turned on, the custom cursor and all animation switch off and every element is shown in place.
+- **Atmosphere.** Dust drifts through the spotlight beam and a fine film grain sits over the stage. The intro counts 000→100 while the stage loads and plays on every visit to the homepage.
+- **Type in motion.**
+  - Names and titles appear letter by letter.
+  - Section labels decode like a typewriter as they appear.
+  - Link text rolls up on hover.
+  - The page-change curtain shows the name of the page you're going to.
+- **Scroll and hover.**
+  - The "With" brand ticker speeds up as you scroll and runs backwards when you scroll up.
+  - Images lean slightly with scroll speed.
+  - The index preview tilts as you move across rows, and portraits and project covers tilt in 3D under the cursor.
+  - The lightbox zooms out of the thumbnail you clicked.
+- **Scene marker.** A vertical "Scene 03 · Selected work" label on the right edge shows which part of the page you're in.
+- **Arabic titles.** Arabic names are set in Aref Ruqaa, the closest free match to the calligraphy on the project boards. On Haret El Lamoun and Haret El Ghagar the Arabic title writes itself right to left.
+- **Motion switch.** "Motion on/off" sits in the footer and the mobile menu. It follows the computer's reduced-motion setting by default and remembers the visitor's choice. With motion off, the custom cursor and all animation stop and every element is shown in place.
 
-Fonts: Cormorant Garamond (display), Instrument Sans with its condensed widths (body and the credits block), IBM Plex Mono (labels).
+Fonts: Cormorant Garamond (display), Instrument Sans with its condensed widths (body and the credits block), IBM Plex Mono (labels), Aref Ruqaa (Arabic).
 
 ## How each review issue was fixed
 
@@ -73,6 +86,7 @@ Fonts: Cormorant Garamond (display), Instrument Sans with its condensed widths (
 3. **Portrait**: a proper portrait photo would beat the crop from the stage photo.
 4. **Image files named `ChatGPT_Image_…`** (Haret El Lamoun, Haret El Ghagar, Re-Play): rename them on Cloudinary, and replace any that aren't Selvana's own renders.
 5. **CV PDF**: the print layout works now. A designed PDF could replace it later.
+6. **Arabic font**: the boards use a calligraphy font that isn't on Google Fonts. If the original font file is available, it can replace Aref Ruqaa in one line of `styles.css`.
 
 ## For production
 

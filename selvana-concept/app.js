@@ -12,11 +12,28 @@
   const WHATSAPP = "201501003126";
   const INSTAGRAM = "https://www.instagram.com/selvanaessam";
 
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const root = document.documentElement;
-  if (!reduceMotion) root.classList.add("motion");
-  if (finePointer && !reduceMotion) root.classList.add("has-cursor");
+  // Motion follows the system setting by default; the "Motion" switch overrides it.
+  let reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  try {
+    const saved = localStorage.getItem("selvana-motion");
+    if (saved) reduceMotion = saved === "reduced";
+  } catch {
+    /* storage unavailable: follow the system setting */
+  }
+  function applyMotion() {
+    root.classList.toggle("motion", !reduceMotion);
+    root.classList.toggle("reduced", reduceMotion);
+    root.classList.toggle("has-cursor", finePointer && !reduceMotion);
+    document.querySelectorAll(".motion-toggle").forEach((b) => {
+      b.setAttribute("aria-pressed", String(!reduceMotion));
+      b.querySelector("span").textContent = reduceMotion ? "Motion off" : "Motion on";
+    });
+    const scene = document.getElementById("scene");
+    if (scene) scene.hidden = reduceMotion;
+  }
+  applyMotion();
 
   /* One name per discipline, used everywhere on the site. */
   const DISC = {
@@ -159,7 +176,7 @@
     </a>`;
 
   const contactHTML = () => `
-    <section class="contact section" id="contact" aria-labelledby="contact-title">
+    <section class="contact section" id="contact" aria-labelledby="contact-title" data-scene="Contact">
       <div class="wrap">
         <p class="label eyebrow" data-reveal>Contact</p>
         <div class="contact__grid">
@@ -208,7 +225,7 @@
     const view = storage.get("selvana-view") === "grid" ? "grid" : "index";
 
     return `
-    <section class="stage" id="stage" aria-labelledby="hero-title">
+    <section class="stage" id="stage" aria-labelledby="hero-title" data-scene="The stage">
       <div class="stage__media" id="heroMedia">
         <picture>
           <source media="(max-width: 699px)" srcset="assets/stage-portrait.webp" />
@@ -218,7 +235,9 @@
       </div>
       <div class="stage__shade" aria-hidden="true"></div>
       <div class="stage__warm" aria-hidden="true"></div>
+      <canvas class="stage__dust" id="dust" aria-hidden="true"></canvas>
       <div class="stage__fade" aria-hidden="true"></div>
+      <div class="stage__grain" aria-hidden="true"></div>
       <div class="stage__inner wrap" id="heroContent">
         <div class="stage__top" data-reveal>
           <span class="label">Portfolio &amp; CV · 2026</span>
@@ -226,7 +245,7 @@
         </div>
         <div class="stage__bottom">
           <p class="stage__role" data-reveal style="--d:.1s">Creative Director for brands, stages and spaces</p>
-          <h1 id="hero-title" class="stage__name" data-split style="--d:.15s">Selvana <em>Essam</em></h1>
+          <h1 id="hero-title" class="stage__name" data-split="chars" style="--d:.15s">Selvana <em>Essam</em></h1>
           <div class="billing" data-reveal style="--d:.45s">
             <p><small>art direction &amp;</small> Set Design <i>✦</i> <small>branding &amp;</small> Creative Direction <i>✦</i> Scenography <small>&amp; spatial design</small></p>
             <p><small>creative director &amp; partner</small> Vana Creative Studio <i>✦</i> <small>since 2020</small> Vana Room <i>✦</i> <small>scenography, faculty of fine arts</small> 2026</p>
@@ -248,7 +267,7 @@
       </div>
     </section>
 
-    <section class="section" aria-labelledby="approach">
+    <section class="section" aria-labelledby="approach" data-scene="Programme note">
       <div class="wrap">
         <p class="label eyebrow" data-reveal>Programme note</p>
         <div class="note-grid">
@@ -270,7 +289,7 @@
       </div>
     </section>
 
-    <section class="section section--tight" aria-labelledby="services" style="padding-top:0">
+    <section class="section section--tight" aria-labelledby="services" style="padding-top:0" data-scene="What I do">
       <div class="wrap">
         <div class="section__head">
           <div><p class="label eyebrow" data-reveal>What I do</p><h2 id="services" class="display h-lg" data-split>Three disciplines, <em>one story.</em></h2></div>
@@ -294,7 +313,7 @@
       </div>
     </section>
 
-    <section class="featured section" aria-labelledby="selected">
+    <section class="featured section" aria-labelledby="selected" data-scene="Selected work">
       <div class="wrap">
         <div class="section__head">
           <div><p class="label eyebrow" data-reveal>Selected work</p><h2 id="selected" class="display h-lg" data-split>Three worlds, <em>start to finish.</em></h2></div>
@@ -326,7 +345,7 @@
       </div>
     </section>
 
-    <section class="section" id="work" aria-labelledby="all-work">
+    <section class="section" id="work" aria-labelledby="all-work" data-scene="Index">
       <div class="wrap">
         <div class="section__head">
           <div><p class="label eyebrow" data-reveal>Index</p><h2 id="all-work" class="display h-lg" data-split>All <em>work.</em></h2></div>
@@ -348,7 +367,7 @@
       </div>
     </section>
 
-    <section class="section section--tight" aria-labelledby="process" style="padding-top:0">
+    <section class="section section--tight" aria-labelledby="process" style="padding-top:0" data-scene="How a project runs">
       <div class="wrap">
         <div class="section__head">
           <div><p class="label eyebrow" data-reveal>How a project runs</p><h2 id="process" class="display h-md" data-split>From the first brief <em>to opening night.</em></h2></div>
@@ -369,9 +388,9 @@
       </div>
     </section>
 
-    <section class="section" aria-labelledby="hello" style="padding-top:0">
+    <section class="section" aria-labelledby="hello" style="padding-top:0" data-scene="About &amp; CV">
       <div class="wrap teaser">
-        <figure class="teaser__img" data-reveal="img"><img src="assets/portrait.webp" alt="Portrait of Selvana Essam on stage" loading="lazy" decoding="async" /></figure>
+        <figure class="teaser__img tilt" data-reveal="img"><img src="assets/portrait.webp" alt="Portrait of Selvana Essam on stage" loading="lazy" decoding="async" /></figure>
         <div class="teaser__body">
           <p class="label eyebrow" data-reveal>About &amp; CV</p>
           <h2 id="hello" class="display h-lg" data-split>Hi, I’m <em>Selvana.</em></h2>
@@ -412,13 +431,17 @@
 
     return `
     <article>
-      <header class="p-head">
+      <header class="p-head" data-scene="The project">
         <div class="wrap">
           <nav class="crumbs label" aria-label="Breadcrumb" data-reveal>
             <a href="#/work">← All work</a><span aria-hidden="true">/</span><a href="#/work?d=${p.discipline}">${esc(d.name)}</a>
           </nav>
-          <h1 class="display p-title" data-split>${esc(p.title)}</h1>
-          <p class="label p-sub" data-reveal>${txt(p.subtitle)}</p>
+          <h1 class="display p-title" data-split="chars">${esc(p.title)}</h1>
+          ${
+            isArabic(p.subtitle)
+              ? `<p class="ar-title" lang="ar" dir="rtl" data-reveal="ar">${esc(p.subtitle)}</p>`
+              : `<p class="label p-sub" data-reveal>${esc(p.subtitle)}</p>`
+          }
           <dl class="p-meta" data-reveal>
             <div><dt class="label">Role</dt><dd>${esc(p.roles.join(", "))}</dd></div>
             <div><dt class="label">Discipline</dt><dd>${esc(d.name)}</dd></div>
@@ -429,12 +452,12 @@
       </header>
 
       <div class="wrap">
-        <figure class="p-cover" data-reveal="img">${
+        <figure class="p-cover tilt" data-reveal="img">${
           p.video ? videoTag(p.video, 1600, `${p.title} campaign film`) : pic(p.cover, { alt: `${p.title}, cover image`, eager: true, sizes: "100vw" })
         }</figure>
       </div>
 
-      <section class="section section--tight" aria-label="About the project">
+      <section class="section section--tight" aria-label="About the project" data-scene="Credits &amp; scope">
         <div class="wrap p-story">
           <aside class="p-story__aside">
             <div data-reveal>
@@ -453,11 +476,11 @@
         </div>
       </section>
 
-      <section class="section section--tight" aria-label="Gallery" style="padding-top:0">
+      <section class="section section--tight" aria-label="Gallery" style="padding-top:0" data-scene="Plates">
         <div class="wrap"><div class="gallery">${gallery}</div></div>
       </section>
 
-      <a class="next" href="#/work/${next.slug}" data-cursor="Next">
+      <a class="next" href="#/work/${next.slug}" data-cursor="Next" data-scene="Next project">
         <div class="next__bg">${pic(next.cover, { alt: "", sizes: "100vw" })}</div>
         <div class="wrap">
           <p class="label eyebrow">Next project · ${esc(DISC[next.discipline].name)}</p>
@@ -480,11 +503,11 @@
       ["Languages", "Arabic (native), English (upper-intermediate)"],
     ];
     return `
-    <section class="cv-head" aria-labelledby="cv-title">
+    <section class="cv-head" aria-labelledby="cv-title" data-scene="About &amp; CV">
       <div class="wrap cv-head__grid">
         <div>
           <p class="label eyebrow" data-reveal>About &amp; CV</p>
-          <h1 id="cv-title" class="display cv-title" data-split>Selvana <em>Essam</em></h1>
+          <h1 id="cv-title" class="display cv-title" data-split="chars">Selvana <em>Essam</em></h1>
           <p class="cv-role" data-reveal>Creative Director · Art Director · Scenographer</p>
           <dl class="facts" data-reveal>
             <div><dt class="label">Based in</dt><dd>Alexandria, Egypt</dd></div>
@@ -497,7 +520,7 @@
             <a class="btn btn--ghost" href="#/contact">Start a project</a>
           </div>
         </div>
-        <figure class="cv-head__img" data-reveal="img"><img src="assets/portrait.webp" alt="Portrait of Selvana Essam on stage" decoding="async" /></figure>
+        <figure class="cv-head__img tilt" data-reveal="img"><img src="assets/portrait.webp" alt="Portrait of Selvana Essam on stage" decoding="async" /></figure>
       </div>
     </section>
 
@@ -513,7 +536,7 @@
       </div>
     </section>
 
-    <section class="section section--tight" aria-labelledby="exp">
+    <section class="section section--tight" aria-labelledby="exp" data-scene="Experience">
       <div class="wrap">
         <div class="section__head"><div><p class="label eyebrow" data-reveal>Experience</p><h2 id="exp" class="display h-md" data-split>Where I’ve <em>worked.</em></h2></div></div>
         <div class="credits">
@@ -526,7 +549,7 @@
       </div>
     </section>
 
-    <section class="section section--tight" aria-labelledby="credits">
+    <section class="section section--tight" aria-labelledby="credits" data-scene="Selected credits">
       <div class="wrap">
         <div class="section__head"><div><p class="label eyebrow" data-reveal>Selected credits</p><h2 id="credits" class="display h-md" data-split>Twelve <em>productions.</em></h2></div></div>
         <ul class="leaders" data-reveal>
@@ -535,7 +558,7 @@
       </div>
     </section>
 
-    <section class="section section--tight" aria-labelledby="skills">
+    <section class="section section--tight" aria-labelledby="skills" data-scene="Expertise &amp; tools">
       <div class="wrap">
         <div class="section__head"><div><p class="label eyebrow" data-reveal>Expertise &amp; tools</p><h2 id="skills" class="display h-md" data-split>What I <em>bring.</em></h2></div></div>
         <div class="skills">${skills.map(([t, d]) => `<div class="skill" data-reveal><h3 class="label">${t}</h3><p>${d}</p></div>`).join("")}</div>
@@ -645,6 +668,8 @@
     if (navigating) return;
     navigating = true;
     const curtain = $("#curtain");
+    $(".curtain__mark", curtain).textContent =
+      route.kind === "project" ? route.project.title : route.kind === "cv" ? "About & CV" : route.target === "#contact" ? "Contact" : "Selvana";
     if (!reduceMotion) {
       curtain.classList.remove("is-up");
       curtain.classList.add("is-down");
@@ -691,14 +716,7 @@
   function playIntro(route) {
     const intro = $("#intro");
     const heroContent = $("#heroContent");
-    let seen = false;
-    try {
-      seen = sessionStorage.getItem("selvana-intro") === "1";
-      sessionStorage.setItem("selvana-intro", "1");
-    } catch {
-      seen = false;
-    }
-    if (reduceMotion || seen || route.kind !== "home" || route.target) {
+    if (reduceMotion || route.kind !== "home" || route.target) {
       if (heroContent) revealNow(heroContent);
       return;
     }
@@ -706,7 +724,19 @@
     document.body.classList.add("is-locked");
     const heroImg = $("#heroMedia img");
     const ready = heroImg && !heroImg.complete ? new Promise((r) => heroImg.addEventListener("load", r, { once: true })) : Promise.resolve();
-    Promise.all([Promise.race([ready, wait(1600)]), wait(1100)]).then(() => {
+    const count = $("#introCount");
+    const t0 = performance.now();
+    let counting = true;
+    const tickCount = (t) => {
+      if (!counting) return;
+      const k = clamp((t - t0) / 1300, 0, 0.99);
+      count.textContent = String(Math.round(k * 100)).padStart(3, "0");
+      requestAnimationFrame(tickCount);
+    };
+    requestAnimationFrame(tickCount);
+    Promise.all([Promise.race([ready, wait(1600)]), wait(1300)]).then(() => {
+      counting = false;
+      count.textContent = "100";
       intro.classList.add("is-open");
       const media = $("#heroMedia");
       if (media && media.animate) {
@@ -723,6 +753,8 @@
   /* ---------- Reveals ---------- */
   let io = null;
   function splitWords(el) {
+    if (el.classList.contains("split")) return;
+    const chars = el.dataset.split === "chars";
     let i = 0;
     const walk = (node) => {
       Array.from(node.childNodes).forEach((n) => {
@@ -736,10 +768,12 @@
             }
             const w = document.createElement("span");
             w.className = "w";
-            const s = document.createElement("span");
-            s.textContent = part;
-            s.style.setProperty("--i", i++);
-            w.appendChild(s);
+            (chars ? Array.from(part) : [part]).forEach((piece) => {
+              const s = document.createElement("span");
+              s.textContent = piece;
+              s.style.setProperty("--i", i++);
+              w.appendChild(s);
+            });
             frag.appendChild(w);
           });
           n.replaceWith(frag);
@@ -748,6 +782,28 @@
     };
     walk(el);
     el.classList.add("split");
+    if (chars) el.classList.add("split--chars");
+  }
+
+  // Labels decode like a typewriter as they appear.
+  const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/·";
+  function scramble(el) {
+    if (el.dataset.scrambled || reduceMotion) return;
+    el.dataset.scrambled = "1";
+    const final = el.textContent;
+    const total = 20;
+    let f = 0;
+    const id = setInterval(() => {
+      f++;
+      const solved = Math.floor((f / total) * final.length);
+      el.textContent = Array.from(final)
+        .map((c, k) => (k < solved || c === " " ? c : GLYPHS[(Math.random() * GLYPHS.length) | 0]))
+        .join("");
+      if (f >= total) {
+        clearInterval(id);
+        el.textContent = final;
+      }
+    }, 32);
   }
 
   function revealNow(scope) {
@@ -764,6 +820,7 @@
         entries.forEach((e) => {
           if (e.isIntersecting) {
             e.target.classList.add("is-in");
+            if (e.target.classList.contains("eyebrow")) scramble(e.target);
             io.unobserve(e.target);
           }
         }),
@@ -772,6 +829,26 @@
     $$("[data-split]", view).forEach(splitWords);
     $$("[data-reveal], [data-split]", view).forEach((el) => {
       if (!el.closest("#heroContent")) io.observe(el);
+    });
+  }
+
+  // Link text rolls up on hover: the visible label slides away and a copy rises in.
+  function rollify(scope) {
+    $$(".nav a, .cue, .header__cta, .link-arrow, .footer__cols a", scope).forEach((el) => {
+      if (el.dataset.rolled) return;
+      const t = Array.from(el.childNodes).find((n) => n.nodeType === 3 && n.textContent.trim());
+      if (!t) return;
+      el.dataset.rolled = "1";
+      const text = t.textContent.trim();
+      const wrap = document.createElement("span");
+      wrap.className = "roll";
+      const inner = document.createElement("span");
+      inner.textContent = text;
+      inner.dataset.text = text;
+      wrap.appendChild(inner);
+      const lead = t.textContent.match(/^\s*/)[0];
+      const trail = t.textContent.match(/\s*$/)[0];
+      t.replaceWith(document.createTextNode(lead), wrap, document.createTextNode(trail));
     });
   }
 
@@ -901,8 +978,9 @@
     fp.on = false;
     floatPreview?.classList.remove("is-on");
   }
-  if (finePointer && !reduceMotion) {
+  if (finePointer) {
     document.addEventListener("mouseover", (e) => {
+      if (reduceMotion) return;
       const t = e.target.closest("[data-preview]");
       if (t) showPreview(t.dataset.preview, e);
       else if (fp.on) hidePreview();
@@ -917,12 +995,27 @@
   let lbIdx = 0;
   let lbReturn = null;
 
-  function lbShow(i) {
+  function lbShow(i, origin) {
     lbIdx = (i + lbItems.length) % lbItems.length;
     const it = lbItems[lbIdx];
     lbStage.innerHTML = `<img src="${it.dataset.full}" alt="${esc($("img", it).alt)}">`;
     const im = $("img", lbStage);
-    const done = () => requestAnimationFrame(() => im.classList.add("is-in"));
+    const done = () =>
+      requestAnimationFrame(() => {
+        if (origin && !reduceMotion && im.animate) {
+          const a = origin.getBoundingClientRect();
+          const b = im.getBoundingClientRect();
+          if (b.width) {
+            const dx = a.left + a.width / 2 - (b.left + b.width / 2);
+            const dy = a.top + a.height / 2 - (b.top + b.height / 2);
+            im.animate([{ transform: `translate(${dx}px, ${dy}px) scale(${a.width / b.width})`, opacity: 0.85 }, { transform: "none", opacity: 1 }], {
+              duration: 750,
+              easing: "cubic-bezier(.16,1,.3,1)",
+            });
+          }
+        }
+        im.classList.add("is-in");
+      });
     if (im.complete) done();
     else im.addEventListener("load", done, { once: true });
     lbCount.textContent = `PL. ${pad(lbIdx + 1)} / ${pad(lbItems.length)}`;
@@ -934,7 +1027,7 @@
     lb.hidden = false;
     document.body.classList.add("is-locked");
     requestAnimationFrame(() => lb.classList.add("is-open"));
-    lbShow(i);
+    lbShow(i, lbItems[i]);
     $(".lightbox__close", lb).focus();
   }
   function lbClose() {
@@ -1031,6 +1124,17 @@
       else toast(value);
       return;
     }
+    if (e.target.closest(".motion-toggle")) {
+      reduceMotion = !reduceMotion;
+      storage.set("selvana-motion", reduceMotion ? "reduced" : "full");
+      applyMotion();
+      if (current) {
+        render(current);
+        if (!reduceMotion) revealNow(view);
+      }
+      toast(reduceMotion ? "Motion off" : "Motion on");
+      return;
+    }
     if (e.target.closest("[data-print]")) {
       window.print();
       return;
@@ -1098,7 +1202,7 @@
   const ringLabel = $(".cursor-ring__label", ring);
   const cur = { x: -100, y: -100, rx: -100, ry: -100, tx: -100, ty: -100 };
   const spot = { x: 50, y: 34, tx: 50, ty: 34, inside: false };
-  if (finePointer && !reduceMotion) {
+  if (finePointer) {
     window.addEventListener(
       "mousemove",
       (e) => {
@@ -1146,7 +1250,22 @@
     document.addEventListener(
       "mousemove",
       (e) => {
+        if (reduceMotion) return;
         const m = e.target.closest(".btn, .cue, .header__cta");
+        const tiltEl = e.target.closest(".tilt");
+        $$(".tilt.is-tilted").forEach((el) => {
+          if (el !== tiltEl) {
+            el.classList.remove("is-tilted");
+            el.style.transform = "";
+          }
+        });
+        if (tiltEl) {
+          const tr = tiltEl.getBoundingClientRect();
+          const px = (e.clientX - tr.left) / tr.width - 0.5;
+          const py = (e.clientY - tr.top) / tr.height - 0.5;
+          tiltEl.classList.add("is-tilted");
+          tiltEl.style.transform = `perspective(1000px) rotateY(${(px * 7).toFixed(2)}deg) rotateX(${(-py * 7).toFixed(2)}deg)`;
+        }
         $$(".is-pulled").forEach((el) => {
           if (el !== m) {
             el.classList.remove("is-pulled");
@@ -1166,8 +1285,78 @@
 
   /* ---------- Scroll- and pointer-driven motion (one rAF loop) ---------- */
   let lastY = window.scrollY;
+  let marqueeRate = 1;
+  let marqueeDir = 1;
+  let skew = 0;
+  let sceneName = "";
+  const dust = { el: null, ctx: null, w: 0, h: 0, dpr: 1, parts: [] };
+  function setupDust() {
+    dust.el = $("#dust", view);
+    if (!dust.el) return;
+    dust.ctx = dust.el.getContext("2d");
+    sizeDust();
+    dust.parts = Array.from({ length: 110 }, () => ({
+      x: Math.random() * dust.w,
+      y: Math.random() * dust.h,
+      r: (0.5 + Math.random() * 1.7) * dust.dpr,
+      vx: (Math.random() - 0.5) * 0.18 * dust.dpr,
+      vy: -(0.05 + Math.random() * 0.22) * dust.dpr,
+      a: 0.35 + Math.random() * 0.65,
+      o: Math.random() * 6.28,
+    }));
+  }
+  function sizeDust() {
+    if (!dust.el) return;
+    dust.dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    dust.w = dust.el.width = Math.round(dust.el.clientWidth * dust.dpr);
+    dust.h = dust.el.height = Math.round(dust.el.clientHeight * dust.dpr);
+  }
+  window.addEventListener("resize", sizeDust);
+  function drawDust(t) {
+    const { ctx, w, h } = dust;
+    if (!ctx || !w) return;
+    ctx.clearRect(0, 0, w, h);
+    const sx = (spot.x / 100) * w;
+    const sy = (spot.y / 100) * h;
+    const R = Math.max(window.innerWidth, window.innerHeight) * 0.34 * dust.dpr;
+    ctx.fillStyle = "#ffe2b8";
+    for (const p of dust.parts) {
+      p.x += p.vx + Math.sin(t / 1400 + p.o) * 0.08;
+      p.y += p.vy;
+      if (p.y < -5) p.y = h + 5;
+      if (p.x < -5) p.x = w + 5;
+      if (p.x > w + 5) p.x = -5;
+      const k = 1 - Math.hypot(p.x - sx, p.y - sy) / R;
+      if (k <= 0.02) continue;
+      ctx.globalAlpha = k * k * p.a;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+  function updateScene(vh) {
+    const el = $("#scene");
+    if (!el || reduceMotion) return;
+    const scenes = $$("[data-scene]", view);
+    let idx = -1;
+    scenes.forEach((s, i) => {
+      const r = s.getBoundingClientRect();
+      if (r.top <= vh * 0.5 && r.bottom > vh * 0.5) idx = i;
+    });
+    const name = idx >= 0 ? `Scene ${pad(idx + 1)} · ${scenes[idx].dataset.scene}` : "";
+    if (name === sceneName) return;
+    sceneName = name;
+    el.classList.add("is-swap");
+    setTimeout(() => {
+      $("span", el).textContent = name;
+      el.classList.remove("is-swap");
+    }, 250);
+  }
+
   function frame(t) {
     const y = window.scrollY;
+    const v = y - lastY;
     const vh = window.innerHeight;
     const page = current ? current.kind : "home";
     const menuOpen = document.body.classList.contains("menu-open");
@@ -1191,6 +1380,22 @@
     } else prog.style.transform = "scaleX(0)";
 
     if (!reduceMotion) {
+      // Brand ticker speeds up with scrolling and runs backwards when you scroll up.
+      if (v) marqueeDir = v > 0 ? 1 : -1;
+      marqueeRate += (marqueeDir * (1 + Math.min(Math.abs(v) * 0.15, 6)) - marqueeRate) * 0.08;
+      $$(".marquee__track", view).forEach((tr) => {
+        const a = tr.getAnimations ? tr.getAnimations()[0] : null;
+        if (a) a.playbackRate = marqueeRate;
+      });
+
+      // Images lean slightly with scroll speed.
+      if (finePointer) {
+        skew += (clamp(v * 0.05, -3, 3) - skew) * 0.12;
+        root.style.setProperty("--skew", `${skew.toFixed(3)}deg`);
+      }
+
+      updateScene(vh);
+
       // Stage: parallax, and a spotlight that follows the pointer (or drifts on touch screens).
       if (stage && y < vh * 1.2) {
         const media = $("#heroMedia", view);
@@ -1203,6 +1408,7 @@
         spot.y += (spot.ty - spot.y) * 0.08;
         stage.style.setProperty("--sx", `${spot.x.toFixed(2)}%`);
         stage.style.setProperty("--sy", `${spot.y.toFixed(2)}%`);
+        drawDust(t);
       }
 
       // Programme note words.
@@ -1237,11 +1443,13 @@
         dot.style.transform = `translate3d(${cur.x}px, ${cur.y}px, 0)`;
         ring.style.transform = `translate3d(${cur.rx}px, ${cur.ry}px, 0)`;
         if (floatPreview && fp.on) {
-          fp.x += (fp.tx - fp.x) * 0.14;
+          const vx = fp.tx - fp.x;
+          fp.x += vx * 0.14;
           fp.y += (fp.ty - fp.y) * 0.14;
           floatPreview.style.left = `${fp.x}px`;
           floatPreview.style.top = `${fp.y}px`;
-        }
+          floatPreview.style.transform = `translate(-50%, -50%) scale(1) rotate(${(-3 + clamp(vx * 0.06, -12, 12)).toFixed(2)}deg)`;
+        } else if (floatPreview && floatPreview.style.transform) floatPreview.style.transform = "";
       }
     }
     requestAnimationFrame(frame);
@@ -1257,13 +1465,29 @@
   }
 
   function initPage(route) {
+    sceneName = "";
     initScrub();
     initReveals();
     initVideos();
+    rollify(view);
+    setupDust();
     if (route.kind === "home") {
       const f = route.params.get("d");
       if (f && DISC[f]) applyFilter(f, false);
     }
+  }
+
+  rollify(document);
+  const footMark = $(".footer__mark");
+  if (footMark && !reduceMotion) {
+    splitWords(footMark);
+    const fio = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        footMark.classList.add("is-in");
+        fio.disconnect();
+      }
+    });
+    fio.observe(footMark);
   }
 
   navigate();
