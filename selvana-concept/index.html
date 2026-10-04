@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Selvana Essam — Creative Director · Art Direction, Branding & Set Design</title>
+  <title>Selvana Essam — Creative Director · Portfolio & CV</title>
   <meta name="description" content="Selvana Essam is a Creative Director in Alexandria, Egypt, building visual worlds for brands, stages and spaces — art direction, branding and set design from first idea to finished set." />
   <meta name="theme-color" content="#F5F1EA" />
   <meta property="og:type" content="website" />
@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wdth,wght@75..100,400..700&display=swap" rel="stylesheet" />
   <link rel="preload" as="image" href="assets/stage-1536.webp" media="(min-width: 700px)" />
   <link rel="preload" as="image" href="assets/stage-portrait.webp" media="(max-width: 699px)" />
   <link rel="stylesheet" href="styles.css" />
@@ -27,7 +27,7 @@
   <div class="intro" id="intro" aria-hidden="true">
     <div class="intro__panel intro__panel--l"></div>
     <div class="intro__panel intro__panel--r"></div>
-    <div class="intro__mark"><span>Selvana</span></div>
+    <div class="intro__mark"><span>Selvana</span><small>Portfolio &amp; CV</small></div>
   </div>
 
   <!-- Page transition: a velvet curtain drops between pages -->
@@ -39,10 +39,10 @@
     <a class="brand" href="#/" aria-label="Selvana Essam — home">Selvana <em>Essam</em></a>
     <nav class="nav" aria-label="Main">
       <a href="#/work" data-nav="work">Work</a>
-      <a href="#/about" data-nav="about">About</a>
+      <a href="#/cv" data-nav="cv">About &amp; CV</a>
       <a href="#/contact" data-nav="contact">Contact</a>
     </nav>
-    <a class="btn btn--pill header__cta magnetic" href="#/contact">Start a project</a>
+    <a class="btn btn--ghost header__cta" href="#/contact">Start a project</a>
     <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
       <span></span><span></span>
     </button>
@@ -52,7 +52,7 @@
     <nav class="menu__nav" aria-label="Mobile">
       <a href="#/" data-i="0">Home</a>
       <a href="#/work" data-i="1">Work</a>
-      <a href="#/about" data-i="2">About</a>
+      <a href="#/cv" data-i="2">About &amp; CV</a>
       <a href="#/contact" data-i="3">Contact</a>
     </nav>
     <div class="menu__foot">
@@ -70,18 +70,18 @@
     </div>
     <div class="footer__cols">
       <div>
-        <h3>Pages</h3>
+        <h3 class="label">Pages</h3>
         <a href="#/work">Work</a>
-        <a href="#/about">About</a>
+        <a href="#/cv">About &amp; CV</a>
         <a href="#/contact">Contact</a>
       </div>
       <div>
-        <h3>Contact</h3>
+        <h3 class="label">Contact</h3>
         <a href="mailto:selvanaessam778@gmail.com">selvanaessam778@gmail.com</a>
         <a href="tel:+201501003126">+20 150 100 3126</a>
       </div>
       <div>
-        <h3>Elsewhere</h3>
+        <h3 class="label">Elsewhere</h3>
         <a href="https://www.instagram.com/selvanaessam" target="_blank" rel="noopener">Instagram ↗</a>
         <span>Alexandria, Egypt</span>
       </div>
@@ -92,7 +92,8 @@
     </div>
   </footer>
 
-  <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
+  <div class="cursor-ring" id="cursorRing" aria-hidden="true"><span class="cursor-ring__label"></span></div>
+  <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" hidden>

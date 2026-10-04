@@ -1,5 +1,5 @@
 /* Content for the Selvana Essam portfolio concept.
- * Text and media are taken from selvana.art; media is served from her Cloudinary account.
+ * Text and media are taken from selvana.art; media is served from Selvana's Cloudinary account.
  * Gallery entries prefixed with "video:" are Cloudinary videos; "e_trim/" crops white slide borders. */
 window.SELVANA = {
   "projects": [
