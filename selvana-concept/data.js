@@ -1,7 +1,11 @@
 /* Content for the Selvana Essam portfolio concept.
  * Text and media are taken from selvana.art; media is served from Selvana's Cloudinary account.
  * Gallery entries prefixed with "video:" are Cloudinary videos; "e_trim/" crops white slide borders.
- * "widths" holds each image's original pixel width, so no image is ever served larger than its source. */
+ * "dims" holds each image's original [width, height]: images are never served larger than their source,
+ * and every <img> gets width/height so lazy loading and layout work before it arrives.
+ * A path may start with transformations (e.g. "e_trim/" or "c_crop,…/") applied before sizing.
+ * Gallery entries: a path, "video:<path>", {board, src} (plans and boards shown on paper)
+ * or {pair, labels} (two images side by side). {tbc: "…"} marks a fact to confirm with Selvana. */
 window.SELVANA = {
   "projects": [
     {
@@ -27,12 +31,11 @@ window.SELVANA = {
         "Fashion Campaign"
       ],
       "body": [
-        "Closer is a fashion campaign built around a playful and expressive visual language. I worked as the Set Designer, developing the physical environment and creating the visual elements that shaped the campaign's setting.",
-        "I designed and created the custom props used throughout the shoot, translating the brand's visual direction into bold, sculptural elements that interact with the model, fashion, and surrounding landscape.",
-        "The set and props were designed to create a playful, graphic atmosphere while keeping the focus on the fashion and strengthening the campaign's visual identity."
+        "Closer is a fashion campaign built around a playful and expressive visual language. I worked as the Set Designer, developing the physical environment and creating the visual elements that shaped the campaign’s setting.",
+        "I designed and created the custom props used throughout the shoot, translating the brand’s visual direction into bold, sculptural elements that interact with the model, fashion, and surrounding landscape.",
+        "The set and props were designed to create a playful, graphic atmosphere while keeping the focus on the fashion and strengthening the campaign’s visual identity."
       ],
       "gallery": [
-        "v1790788446/572040295_18379599217148569_6576358955398261144_n_suhrjj.jpg",
         "v1790788457/573705153_18379599292148569_6236305708123935734_n_y6u5hi.jpg",
         "v1790788461/573835479_18379599283148569_5363533456503602805_n_fgkayy.jpg",
         "v1790788449/572468171_18379599226148569_1103634615938930768_n_d9wpcx.jpg",
@@ -40,14 +43,19 @@ window.SELVANA = {
         "v1790788465/574529240_18379599250148569_86189204066355755_n_eb84ad.jpg"
       ],
       "renders": false,
-      "widths": {
-        "v1790788446/572040295_18379599217148569_6576358955398261144_n_suhrjj.jpg": 1080,
-        "v1790788457/573705153_18379599292148569_6236305708123935734_n_y6u5hi.jpg": 1080,
-        "v1790788461/573835479_18379599283148569_5363533456503602805_n_fgkayy.jpg": 1080,
-        "v1790788449/572468171_18379599226148569_1103634615938930768_n_d9wpcx.jpg": 1080,
-        "v1790788453/573211676_18379599301148569_8783623790976227836_n_curhj2.jpg": 1080,
-        "v1790788465/574529240_18379599250148569_86189204066355755_n_eb84ad.jpg": 1080
-      }
+      "facts": {
+        "client": {
+          "tbc": "Client?"
+        },
+        "year": {
+          "tbc": "Year?"
+        },
+        "city": {
+          "tbc": "City?"
+        },
+        "status": "Shot"
+      },
+      "kind": "Client"
     },
     {
       "slug": "lavern",
@@ -61,7 +69,7 @@ window.SELVANA = {
       ],
       "type": "Client project",
       "summary": "A set and visual world for a fragrance campaign — the space became part of the story.",
-      "cover": "v1791060895/selvana/projects/direction/lavern/eto5u5a1xntu4isvjstd.jpg",
+      "cover": "v1791060991/selvana/projects/direction/lavern/hcigh2nm2hujdwp75kf9.jpg",
       "hover": "v1791060899/selvana/projects/direction/lavern/pmlkldmoxefmmx32dysr.jpg",
       "video": "v1791060985/selvana/projects/direction/lavern/nmniyolmkmgcb7zqfl96",
       "scope": [
@@ -73,28 +81,31 @@ window.SELVANA = {
         "Materials"
       ],
       "body": [
-        "LAVERN was a visual production project focused on creating a distinctive set and visual world that supported the brand's creative direction. As Art Director and Set Designer, I developed the visual concept of the set and translated the creative direction into the physical environment.",
+        "LAVERN was a visual production project focused on creating a distinctive set and visual world that supported the brand’s creative direction. As Art Director and Set Designer, I developed the visual concept of the set and translated the creative direction into the physical environment.",
         "I worked on the set concept, spatial composition, visual styling, materials, and overall atmosphere, ensuring that the environment worked cohesively with the intended visual identity and photographic direction.",
         "The project focused on creating a strong visual setting that could function not only as a backdrop, but as an integral part of the overall image and storytelling."
       ],
       "gallery": [
-        "v1791060895/selvana/projects/direction/lavern/eto5u5a1xntu4isvjstd.jpg",
-        "video:v1791060910/selvana/projects/direction/lavern/j6q5h2ut4szbldugqldo",
         "v1791060899/selvana/projects/direction/lavern/pmlkldmoxefmmx32dysr.jpg",
+        "video:v1791060910/selvana/projects/direction/lavern/j6q5h2ut4szbldugqldo",
+        "v1791060997/selvana/projects/direction/lavern/yfag2krwvlfiz72jy69e.jpg",
         "video:v1791060932/selvana/projects/direction/lavern/tps4r8yww521hczwhjla",
         "v1791060903/selvana/projects/direction/lavern/i9wgso1eoq85xykiq6fe.jpg",
         "video:v1791060960/selvana/projects/direction/lavern/niy3jstr3kxz7b8wv8mu",
-        "v1791060991/selvana/projects/direction/lavern/hcigh2nm2hujdwp75kf9.jpg",
-        "v1791060997/selvana/projects/direction/lavern/yfag2krwvlfiz72jy69e.jpg"
+        "v1791060895/selvana/projects/direction/lavern/eto5u5a1xntu4isvjstd.jpg"
       ],
       "renders": false,
-      "widths": {
-        "v1791060895/selvana/projects/direction/lavern/eto5u5a1xntu4isvjstd.jpg": 1724,
-        "v1791060899/selvana/projects/direction/lavern/pmlkldmoxefmmx32dysr.jpg": 1605,
-        "v1791060903/selvana/projects/direction/lavern/i9wgso1eoq85xykiq6fe.jpg": 1605,
-        "v1791060991/selvana/projects/direction/lavern/hcigh2nm2hujdwp75kf9.jpg": 1290,
-        "v1791060997/selvana/projects/direction/lavern/yfag2krwvlfiz72jy69e.jpg": 1290
-      }
+      "facts": {
+        "client": "LAVERN",
+        "year": {
+          "tbc": "Year?"
+        },
+        "city": {
+          "tbc": "City?"
+        },
+        "status": "Shot"
+      },
+      "kind": "Client"
     },
     {
       "slug": "re-play",
@@ -125,24 +136,23 @@ window.SELVANA = {
         "I developed the location from the initial concept through the spatial composition, set elements, visual language, and 3D development, creating the final environment for the production."
       ],
       "gallery": [
-        "v1790788576/ccc_a7kxec.jpg",
-        "v1790788558/2_tnmprw.jpg",
-        "v1790788568/555_yosamu.jpg",
-        "v1790788572/BHB_lnrfef.jpg",
         "v1790788581/ChatGPT_Image_Sep_26_2026_05_51_06_PM_gg7kcs.png",
         "v1790788584/SAAS_aybvq7.jpg",
-        "v1790788588/zs_zok3yf.jpg"
+        "v1790788576/ccc_a7kxec.jpg",
+        "v1790788558/2_tnmprw.jpg",
+        "v1790788568/555_yosamu.jpg"
       ],
       "renders": true,
-      "widths": {
-        "v1790788576/ccc_a7kxec.jpg": 1280,
-        "v1790788558/2_tnmprw.jpg": 1280,
-        "v1790788568/555_yosamu.jpg": 1280,
-        "v1790788572/BHB_lnrfef.jpg": 1280,
-        "v1790788581/ChatGPT_Image_Sep_26_2026_05_51_06_PM_gg7kcs.png": 1672,
-        "v1790788584/SAAS_aybvq7.jpg": 1280,
-        "v1790788588/zs_zok3yf.jpg": 1280
-      }
+      "facts": {
+        "client": {
+          "tbc": "Client?"
+        },
+        "year": {
+          "tbc": "Year?"
+        },
+        "status": "Concept"
+      },
+      "kind": "Concept"
     },
     {
       "slug": "chai",
@@ -155,8 +165,8 @@ window.SELVANA = {
       ],
       "type": "Client project",
       "summary": "Interior and exterior for a hospitality brand inside a hotel.",
-      "cover": "v1790787247/4_bs4n4t.png",
-      "hover": "v1790787260/13_ovhmgk.png",
+      "cover": "v1790787262/15_rvspzu.png",
+      "hover": "v1790787247/4_bs4n4t.png",
       "video": null,
       "scope": [
         "Concept Design",
@@ -173,32 +183,30 @@ window.SELVANA = {
         "The design aimed to create a welcoming and visually distinctive space while maintaining a balance between the brand identity, architectural context, and guest experience."
       ],
       "gallery": [
-        "v1790787250/5_hkbku2.png",
+        "v1790787263/16_afcpry.png",
         "v1790787247/4_bs4n4t.png",
-        "v1790787252/8_rvw5fn.png",
-        "v1790787253/9_yztk3m.png",
         "v1790787256/11_plmjka.png",
+        "v1790787260/13_ovhmgk.png",
+        "v1790787252/8_rvw5fn.png",
         "v1790787258/10_z289sw.png",
         "v1790787258/12_qzgnju.png",
-        "v1790787260/13_ovhmgk.png",
-        "v1790787262/15_rvspzu.png",
-        "v1790787263/16_afcpry.png",
+        "v1790787250/5_hkbku2.png",
         "v1790787263/7_gjcybx.png"
       ],
       "renders": true,
-      "widths": {
-        "v1790787250/5_hkbku2.png": 1920,
-        "v1790787247/4_bs4n4t.png": 1920,
-        "v1790787252/8_rvw5fn.png": 1920,
-        "v1790787253/9_yztk3m.png": 1920,
-        "v1790787256/11_plmjka.png": 1920,
-        "v1790787258/10_z289sw.png": 1920,
-        "v1790787258/12_qzgnju.png": 1920,
-        "v1790787260/13_ovhmgk.png": 1920,
-        "v1790787262/15_rvspzu.png": 1920,
-        "v1790787263/16_afcpry.png": 1920,
-        "v1790787263/7_gjcybx.png": 1920
-      }
+      "facts": {
+        "client": "CHAI",
+        "year": {
+          "tbc": "Year?"
+        },
+        "city": {
+          "tbc": "Salalah?"
+        },
+        "status": {
+          "tbc": "Built?"
+        }
+      },
+      "kind": "Client"
     },
     {
       "slug": "colt-coffee",
@@ -210,8 +218,8 @@ window.SELVANA = {
       ],
       "type": "Client project",
       "summary": "Identity, packaging and space — one coffee brand, directed end to end.",
-      "cover": "e_trim/v1790787583/colt_1-04.jpg_rqy0aj.jpg",
-      "hover": "e_trim/v1790787587/colt_1-07.jpg_zteswk.jpg",
+      "cover": "e_trim/c_crop,g_north,h_0.93/v1790787607/colt-16.jpg_speeid.jpg",
+      "hover": "e_trim/v1790787583/colt_1-04.jpg_rqy0aj.jpg",
       "video": null,
       "scope": [
         "Creative Direction",
@@ -227,42 +235,43 @@ window.SELVANA = {
         "The project focused on creating a distinctive and consistent brand presence, where the visual identity extends beyond graphic applications into the physical environment and customer experience."
       ],
       "gallery": [
+        {
+          "pair": [
+            "e_trim/c_crop,g_north,h_0.93/v1790787607/colt-15.jpg_gujmco.jpg",
+            "e_trim/c_crop,g_north,h_0.93/v1790787607/colt-16.jpg_speeid.jpg"
+          ],
+          "labels": [
+            "3D render",
+            "Built"
+          ]
+        },
+        "e_trim/v1790787596/colt-11.jpg_ppsmzn.jpg",
+        "e_trim/v1790787600/colt-12.jpg_fnzxfs.jpg",
+        "e_trim/v1790787606/colt-10.jpg_kwtrdm.jpg",
+        "e_trim/v1790787605/colt-14.jpg_dkcgh6.jpg",
+        "e_trim/v1790787615/colt-13.jpg_uwgoic.jpg",
         "e_trim/v1790787583/colt_1-04.jpg_rqy0aj.jpg",
-        "e_trim/v1790787584/colt_1-05.jpg_z0jkmj.jpg",
-        "e_trim/v1790787585/colt_1-06.jpg_pxtcwd.jpg",
         "e_trim/v1790787587/colt_1-07.jpg_zteswk.jpg",
         "e_trim/v1790787590/colt_1-08.jpg_egaa8x.jpg",
-        "e_trim/v1790787590/colt_1-09.jpg_xyb5q0.jpg",
-        "e_trim/v1790787596/colt-11.jpg_ppsmzn.jpg",
+        "e_trim/v1790787584/colt_1-05.jpg_z0jkmj.jpg",
         "e_trim/v1790787599/colt_1-17.jpg_x7afur.jpg",
-        "e_trim/v1790787600/colt-12.jpg_fnzxfs.jpg",
-        "e_trim/v1790787601/Untitled_design_26_r09mia.png",
-        "e_trim/v1790787603/Untitled_design_27_jchxrn.png",
-        "e_trim/v1790787605/colt-14.jpg_dkcgh6.jpg",
-        "e_trim/v1790787606/colt-10.jpg_kwtrdm.jpg",
-        "e_trim/v1790787607/colt-15.jpg_gujmco.jpg",
-        "e_trim/v1790787607/colt-16.jpg_speeid.jpg",
-        "e_trim/v1790787615/colt-13.jpg_uwgoic.jpg"
+        {
+          "board": true,
+          "src": "e_trim/v1790787603/Untitled_design_27_jchxrn.png"
+        }
       ],
       "renders": false,
-      "widths": {
-        "e_trim/v1790787583/colt_1-04.jpg_rqy0aj.jpg": 4500,
-        "e_trim/v1790787584/colt_1-05.jpg_z0jkmj.jpg": 4500,
-        "e_trim/v1790787585/colt_1-06.jpg_pxtcwd.jpg": 4500,
-        "e_trim/v1790787587/colt_1-07.jpg_zteswk.jpg": 4500,
-        "e_trim/v1790787590/colt_1-08.jpg_egaa8x.jpg": 4500,
-        "e_trim/v1790787590/colt_1-09.jpg_xyb5q0.jpg": 4500,
-        "e_trim/v1790787596/colt-11.jpg_ppsmzn.jpg": 4500,
-        "e_trim/v1790787599/colt_1-17.jpg_x7afur.jpg": 4500,
-        "e_trim/v1790787600/colt-12.jpg_fnzxfs.jpg": 4500,
-        "e_trim/v1790787601/Untitled_design_26_r09mia.png": 4500,
-        "e_trim/v1790787603/Untitled_design_27_jchxrn.png": 4500,
-        "e_trim/v1790787605/colt-14.jpg_dkcgh6.jpg": 4500,
-        "e_trim/v1790787606/colt-10.jpg_kwtrdm.jpg": 4500,
-        "e_trim/v1790787607/colt-15.jpg_gujmco.jpg": 4500,
-        "e_trim/v1790787607/colt-16.jpg_speeid.jpg": 4500,
-        "e_trim/v1790787615/colt-13.jpg_uwgoic.jpg": 4500
-      }
+      "facts": {
+        "client": "COLT Coffee",
+        "year": {
+          "tbc": "Year?"
+        },
+        "city": {
+          "tbc": "City?"
+        },
+        "status": "Built"
+      },
+      "kind": "Client"
     },
     {
       "slug": "horse-park",
@@ -276,7 +285,7 @@ window.SELVANA = {
       "type": "Client project",
       "summary": "A complete rebrand for an equestrian park, from identity to environment.",
       "cover": "v1790787511/763778425_18116437462839975_747395101484685220_n_pudrqw.jpg",
-      "hover": "v1790787525/post2-11.jpg_kwykkk.jpg",
+      "hover": "v1790787533/post2-12.jpg_tpnumn.jpg",
       "video": null,
       "scope": [
         "Rebranding",
@@ -288,40 +297,36 @@ window.SELVANA = {
         "Environmental Design"
       ],
       "body": [
-        "Horse Park is a complete rebranding project developed to redefine the brand's visual identity and strengthen its overall presence within the equestrian industry. I led the creative direction and worked on developing a refreshed visual language that could communicate the brand's character through a more cohesive and contemporary identity.",
-        "The project focused on translating the new direction across the brand's visual touchpoints, creating a unified system that could extend from the core identity into communication and environmental applications.",
+        "Horse Park is a complete rebranding project developed to redefine the brand’s visual identity and strengthen its overall presence within the equestrian industry. I led the creative direction and worked on developing a refreshed visual language that could communicate the brand’s character through a more cohesive and contemporary identity.",
+        "The project focused on translating the new direction across the brand’s visual touchpoints, creating a unified system that could extend from the core identity into communication and environmental applications.",
         "The rebranding process combined concept development, visual identity, art direction, and brand application, creating a more distinctive and consistent brand experience."
       ],
       "gallery": [
-        "v1790787525/post2-11.jpg_kwykkk.jpg",
+        "v1790787533/post2-12.jpg_tpnumn.jpg",
         "video:v1790787529/AQMFP6BCJeebPgBLFil2D4Is1srK_RAhaYGFGDM7-MfS6XCeyy8xWZBMxOwa8Yyoz3aCsO_U4mvbRgNl0e62n3fsoLrLqUxFlPjPya0_od3dnh",
         "v1790787511/761585081_18116300281839975_3033399272195792326_n_tfh8nr.jpg",
-        "v1790787511/763778425_18116437462839975_747395101484685220_n_pudrqw.jpg",
         "v1790787515/763778681_18116437447839975_6133524750105069368_n_u75hzc.jpg",
         "v1790787515/763992867_18116300221839975_1491342264916999992_n_mz1mva.jpg",
-        "v1790787516/764636975_18116437471839975_337842301546645856_n_uvkp6d.jpg",
-        "v1790787519/764638325_18116300299839975_3854131530924574320_n_y6ekeq.jpg",
-        "v1790787520/766121387_18116437456839975_5030975468211388802_n_bqonaw.jpg",
         "v1790787526/post1-06.jpg_h784d1.jpg",
-        "v1790787529/post2-14.jpg_kilgss.jpg",
+        "v1790787525/post2-11.jpg_kwykkk.jpg",
         "v1790787530/post1-07.jpg_k3vuuq.jpg",
-        "v1790787533/post2-12.jpg_tpnumn.jpg"
+        "v1790787519/764638325_18116300299839975_3854131530924574320_n_y6ekeq.jpg",
+        "v1790787520/766121387_18116437456839975_5030975468211388802_n_bqonaw.jpg"
       ],
       "renders": false,
-      "widths": {
-        "v1790787525/post2-11.jpg_kwykkk.jpg": 4500,
-        "v1790787511/761585081_18116300281839975_3033399272195792326_n_tfh8nr.jpg": 2148,
-        "v1790787511/763778425_18116437462839975_747395101484685220_n_pudrqw.jpg": 2148,
-        "v1790787515/763778681_18116437447839975_6133524750105069368_n_u75hzc.jpg": 2148,
-        "v1790787515/763992867_18116300221839975_1491342264916999992_n_mz1mva.jpg": 2148,
-        "v1790787516/764636975_18116437471839975_337842301546645856_n_uvkp6d.jpg": 2148,
-        "v1790787519/764638325_18116300299839975_3854131530924574320_n_y6ekeq.jpg": 2148,
-        "v1790787520/766121387_18116437456839975_5030975468211388802_n_bqonaw.jpg": 2148,
-        "v1790787526/post1-06.jpg_h784d1.jpg": 4500,
-        "v1790787529/post2-14.jpg_kilgss.jpg": 4500,
-        "v1790787530/post1-07.jpg_k3vuuq.jpg": 4500,
-        "v1790787533/post2-12.jpg_tpnumn.jpg": 4500
-      }
+      "facts": {
+        "client": "Horse Park",
+        "year": {
+          "tbc": "Year?"
+        },
+        "city": {
+          "tbc": "City?"
+        },
+        "status": {
+          "tbc": "Launched?"
+        }
+      },
+      "kind": "Client"
     },
     {
       "slug": "marbat",
@@ -347,35 +352,40 @@ window.SELVANA = {
         "Digital Product Direction"
       ],
       "body": [
-        "Marbat is an equestrian booking and management platform developed to create a unified digital identity for the equestrian industry. I led the creative direction and developed the core concept, while managing the creative team throughout the project's development.",
+        "Marbat is an equestrian booking and management platform developed to create a unified digital identity for the equestrian industry. I led the creative direction and developed the core concept, while managing the creative team throughout the project’s development.",
         "My role covered the full visual direction of the project, from defining the initial concept and visual language to overseeing the development and consistency of all visual outputs. I managed the creative workflow, reviewed design development, and ensured that the final visual system remained cohesive across the platform and its brand touchpoints.",
         "The project combined brand development, digital product direction, team management, and visual storytelling to create a contemporary identity for the equestrian sector."
       ],
       "gallery": [
-        "v1790787432/marbattt-01.jpg_st68kf.jpg",
-        "v1790787426/7_idjwp7.png",
-        "v1790787428/8_slu2ak.png",
-        "v1790787429/9_re1avd.png",
-        "v1790787433/marbattt-02.jpg_xeytxz.jpg",
         "v1790787435/marbattt-04.jpg_uknhuc.jpg",
         "v1790787439/marbattt-07.jpg_xppwuv.jpg",
         "v1790787441/marbattt-08.jpg_lmd1zs.jpg",
         "v1790787442/marbattt-09.jpg_cmpgc6.jpg",
-        "v1790787444/marbattt-10.jpg_mvl4it.jpg"
+        "v1790787444/marbattt-10.jpg_mvl4it.jpg",
+        {
+          "board": true,
+          "src": "v1790787426/7_idjwp7.png"
+        },
+        {
+          "board": true,
+          "src": "v1790787428/8_slu2ak.png"
+        },
+        {
+          "board": true,
+          "src": "v1790787433/marbattt-02.jpg_xeytxz.jpg"
+        }
       ],
       "renders": false,
-      "widths": {
-        "v1790787432/marbattt-01.jpg_st68kf.jpg": 5321,
-        "v1790787426/7_idjwp7.png": 1280,
-        "v1790787428/8_slu2ak.png": 1280,
-        "v1790787429/9_re1avd.png": 1280,
-        "v1790787433/marbattt-02.jpg_xeytxz.jpg": 5321,
-        "v1790787435/marbattt-04.jpg_uknhuc.jpg": 5321,
-        "v1790787439/marbattt-07.jpg_xppwuv.jpg": 5321,
-        "v1790787441/marbattt-08.jpg_lmd1zs.jpg": 5321,
-        "v1790787442/marbattt-09.jpg_cmpgc6.jpg": 5321,
-        "v1790787444/marbattt-10.jpg_mvl4it.jpg": 5321
-      }
+      "facts": {
+        "client": "Marbat",
+        "year": {
+          "tbc": "Year?"
+        },
+        "status": {
+          "tbc": "Launched?"
+        }
+      },
+      "kind": "Client"
     },
     {
       "slug": "smile-cafe",
@@ -401,55 +411,41 @@ window.SELVANA = {
         "Exterior Design"
       ],
       "body": [
-        "Smile Café is a playful, art-driven café concept designed around creativity, imagination, and the joy of childhood. As Creative Director, I developed the campaign concept and visual direction, creating a distinctive visual identity that could translate naturally across the brand's graphic and physical touchpoints.",
+        "Smile Café is a playful, art-driven café concept designed around creativity, imagination, and the joy of childhood. As Creative Director, I developed the campaign concept and visual direction, creating a distinctive visual identity that could translate naturally across the brand’s graphic and physical touchpoints.",
         "The creative direction extended from the visual identity and packaging to character development, interior, exterior, and spatial design, creating an immersive environment where the brand becomes an experience for children and families.",
         "The project focused on building a colorful and expressive visual world that combines play, storytelling, and art while maintaining a recognizable and cohesive brand language."
       ],
       "gallery": [
-        "v1790787688/1_2_r5wkhw.png",
-        "v1790787684/1_wynvuq.png",
-        "v1790787684/2_2_xgwg4v.png",
-        "v1790787687/2_jxs1dh.png",
-        "v1790787688/3_oaxrgi.png",
-        "v1790787691/4_2_t4x5ce.png",
-        "v1790787695/4_rkwlan.png",
-        "v1790787695/5_2_uysxzd.png",
         "v1790787701/5_ncqzuk.png",
-        "v1790787702/7_o8rix6.png",
+        "v1790787688/1_2_r5wkhw.png",
         "v1790787706/10_enggob.png",
         "v1790787709/12_cwnagp.png",
-        "v1790787711/16_yvh1hq.png",
         "v1790787712/11_rslyf4.png",
+        "v1790787711/16_yvh1hq.png",
         "v1790787714/17_jzbokt.png",
         "v1790787714/18_zv98on.png",
-        "v1790787716/20_mvjxzv.png",
         "v1790787719/24_grupjf.png",
         "v1790787723/26_f8npmi.png",
-        "v1790787725/29_g5ou9w.png"
+        "v1790787725/29_g5ou9w.png",
+        {
+          "board": true,
+          "src": "v1790787684/2_2_xgwg4v.png"
+        }
       ],
       "renders": false,
-      "widths": {
-        "v1790787688/1_2_r5wkhw.png": 1920,
-        "v1790787684/1_wynvuq.png": 1920,
-        "v1790787684/2_2_xgwg4v.png": 1920,
-        "v1790787687/2_jxs1dh.png": 1920,
-        "v1790787688/3_oaxrgi.png": 1920,
-        "v1790787691/4_2_t4x5ce.png": 1920,
-        "v1790787695/4_rkwlan.png": 1920,
-        "v1790787695/5_2_uysxzd.png": 1920,
-        "v1790787701/5_ncqzuk.png": 1920,
-        "v1790787702/7_o8rix6.png": 1920,
-        "v1790787706/10_enggob.png": 1920,
-        "v1790787709/12_cwnagp.png": 1920,
-        "v1790787711/16_yvh1hq.png": 1920,
-        "v1790787712/11_rslyf4.png": 1920,
-        "v1790787714/17_jzbokt.png": 1920,
-        "v1790787714/18_zv98on.png": 1920,
-        "v1790787716/20_mvjxzv.png": 1920,
-        "v1790787719/24_grupjf.png": 1920,
-        "v1790787723/26_f8npmi.png": 1920,
-        "v1790787725/29_g5ou9w.png": 1920
-      }
+      "facts": {
+        "client": "Smile Café",
+        "year": {
+          "tbc": "Year?"
+        },
+        "city": {
+          "tbc": "City?"
+        },
+        "status": {
+          "tbc": "Built?"
+        }
+      },
+      "kind": "Client"
     },
     {
       "slug": "aghyar",
@@ -476,39 +472,33 @@ window.SELVANA = {
         "Cinematic Visualization"
       ],
       "body": [
-        "Dystopia — Aghyar is an academic set design project inspired by Ahmed Khaled Tawfik's dystopian novel Utopia. The project reimagines the novel through a cinematic visual language, exploring a fragmented world shaped by inequality, isolation, and the loss of human values.",
+        "Dystopia — Aghyar is an academic set design project inspired by Ahmed Khaled Tawfik’s dystopian novel Utopia. The project reimagines the novel through a cinematic visual language, exploring a fragmented world shaped by inequality, isolation, and the loss of human values.",
         "I developed a series of dystopian environments and cinematic landscapes, translating the narrative into spatial experiences through architectural composition, materiality, atmosphere, and visual contrast.",
         "The project explores how set design can transform literary themes into visual worlds, using space, environment, and cinematic composition as tools for storytelling."
       ],
       "gallery": [
         "v1790788104/6_in7liq.png",
-        "v1790788073/1_h9gzkc.png",
-        "v1790788085/2_ag61ee.png",
-        "v1790788086/3_qnkgpb.png",
-        "v1790788091/5_dxeph4.png",
-        "v1790788098/4_wrfyec.png",
-        "v1790788109/7_rpfnyy.png",
-        "v1790788114/8_b0ewwa.png",
-        "v1790788119/10_emvoxw.png",
         "v1790788120/11_snmng8.png",
+        "v1790788098/4_wrfyec.png",
+        "v1790788126/12_cxrbwe.png",
+        "v1790788086/3_qnkgpb.png",
         "v1790788121/9_xoieyi.png",
-        "v1790788126/12_cxrbwe.png"
+        "v1790788109/7_rpfnyy.png",
+        "v1790788119/10_emvoxw.png",
+        {
+          "board": true,
+          "src": "v1790788085/2_ag61ee.png"
+        }
       ],
       "renders": true,
-      "widths": {
-        "v1790788104/6_in7liq.png": 4500,
-        "v1790788073/1_h9gzkc.png": 4500,
-        "v1790788085/2_ag61ee.png": 4500,
-        "v1790788086/3_qnkgpb.png": 4500,
-        "v1790788091/5_dxeph4.png": 4500,
-        "v1790788098/4_wrfyec.png": 4500,
-        "v1790788109/7_rpfnyy.png": 4500,
-        "v1790788114/8_b0ewwa.png": 4500,
-        "v1790788119/10_emvoxw.png": 4500,
-        "v1790788120/11_snmng8.png": 4500,
-        "v1790788121/9_xoieyi.png": 4500,
-        "v1790788126/12_cxrbwe.png": 4500
-      }
+      "facts": {
+        "client": "Faculty of Fine Arts, Alexandria University",
+        "year": {
+          "tbc": "Year?"
+        },
+        "status": "Study"
+      },
+      "kind": "Study"
     },
     {
       "slug": "bridge-to-terabithia",
@@ -522,8 +512,8 @@ window.SELVANA = {
       ],
       "type": "Graduation project · 2026",
       "summary": "A complete visual world for the novel — locations, characters and sets.",
-      "cover": "v1790788167/1_aprvo7.png",
-      "hover": "v1790788192/8_bilekx.png",
+      "cover": "c_crop,x_622,y_320,w_1222,h_683/v1790788204/11_lde4at.png",
+      "hover": "c_crop,x_622,y_320,w_1222,h_683/v1790788232/18_ozqfwm.png",
       "video": null,
       "scope": [
         "Art Direction",
@@ -544,88 +534,32 @@ window.SELVANA = {
         "The process included world-building, character development, location design, set design, spatial studies, 3D modeling, visualization, and scene development, creating a fully developed visual interpretation of the novel."
       ],
       "gallery": [
-        "v1790788167/1_aprvo7.png",
-        "v1790788169/2_uzwoxq.png",
-        "v1790788175/3_dj8zdi.png",
-        "v1790788178/4_jfr3jt.png",
-        "v1790788182/5_l9oov3.png",
-        "v1790788185/6_oqhdwl.png",
-        "v1790788189/7_laomjg.png",
-        "v1790788192/8_bilekx.png",
-        "v1790788196/9_glfz5a.png",
-        "v1790788201/10_fd4uy0.png",
-        "v1790788204/11_lde4at.png",
-        "v1790788209/12_p4sl4h.png",
-        "v1790788212/13_yufs4i.png",
-        "v1790788215/14_v9j50d.png",
-        "v1790788220/15_c3qgzq.png",
-        "v1790788228/16_c3ftjj.png",
-        "v1790788232/18_ozqfwm.png",
-        "v1790788233/17_vqkz8i.png",
-        "v1790788238/19_co9yuu.png",
-        "v1790788240/20_zqbr8m.png",
-        "v1790788246/21_lgby1j.png",
-        "v1790788251/22_czjofo.png",
-        "v1790788256/23_fxplja.png",
-        "v1790788259/24_zlafjz.png",
-        "v1790788269/26_jlo2s0.png",
-        "v1790788270/25_xnphth.png",
-        "v1790788271/27_j0yz9n.png",
-        "v1790788279/28_at5kpr.png",
-        "v1790788282/29_nd5uw1.png",
-        "v1790788288/30_gaotnz.png",
-        "v1790788292/31_lrhmhf.png",
-        "v1790788297/32_rehx3m.png",
-        "v1790788302/33_mqiao7.png",
-        "v1790788309/34_qeubf3.png",
-        "v1790788312/35_eqn5fm.png",
-        "v1790788318/36_msbk5n.png",
-        "v1790788321/37_buk2mj.png",
-        "v1790788328/38_qfoonh.png",
-        "v1790788332/39_rnymok.png"
+        "c_crop,x_622,y_320,w_1222,h_683/v1790788192/8_bilekx.png",
+        "c_crop,x_622,y_320,w_1222,h_683/v1790788209/12_p4sl4h.png",
+        "c_crop,x_622,y_320,w_1222,h_683/v1790788201/10_fd4uy0.png",
+        "c_crop,x_622,y_320,w_1222,h_683/v1790788178/4_jfr3jt.png",
+        "c_crop,x_622,y_320,w_1222,h_683/v1790788232/18_ozqfwm.png",
+        "c_crop,x_622,y_320,w_1222,h_683/v1790788228/16_c3ftjj.png",
+        "c_crop,x_622,y_320,w_1222,h_683/v1790788256/23_fxplja.png",
+        "c_crop,x_622,y_320,w_1222,h_683/v1790788251/22_czjofo.png",
+        "c_crop,x_622,y_320,w_1222,h_683/v1790788282/29_nd5uw1.png",
+        "c_crop,x_622,y_320,w_1222,h_683/v1790788279/28_at5kpr.png",
+        {
+          "board": true,
+          "src": "v1790788292/31_lrhmhf.png"
+        },
+        {
+          "board": true,
+          "src": "v1790788220/15_c3qgzq.png"
+        }
       ],
       "renders": true,
-      "widths": {
-        "v1790788167/1_aprvo7.png": 1920,
-        "v1790788169/2_uzwoxq.png": 1920,
-        "v1790788175/3_dj8zdi.png": 1920,
-        "v1790788178/4_jfr3jt.png": 1920,
-        "v1790788182/5_l9oov3.png": 1920,
-        "v1790788185/6_oqhdwl.png": 1920,
-        "v1790788189/7_laomjg.png": 1920,
-        "v1790788192/8_bilekx.png": 1920,
-        "v1790788196/9_glfz5a.png": 1920,
-        "v1790788201/10_fd4uy0.png": 1920,
-        "v1790788204/11_lde4at.png": 1920,
-        "v1790788209/12_p4sl4h.png": 1920,
-        "v1790788212/13_yufs4i.png": 1920,
-        "v1790788215/14_v9j50d.png": 1920,
-        "v1790788220/15_c3qgzq.png": 1920,
-        "v1790788228/16_c3ftjj.png": 1920,
-        "v1790788232/18_ozqfwm.png": 1920,
-        "v1790788233/17_vqkz8i.png": 1920,
-        "v1790788238/19_co9yuu.png": 1920,
-        "v1790788240/20_zqbr8m.png": 1920,
-        "v1790788246/21_lgby1j.png": 1920,
-        "v1790788251/22_czjofo.png": 1920,
-        "v1790788256/23_fxplja.png": 1920,
-        "v1790788259/24_zlafjz.png": 1920,
-        "v1790788269/26_jlo2s0.png": 1920,
-        "v1790788270/25_xnphth.png": 1920,
-        "v1790788271/27_j0yz9n.png": 1920,
-        "v1790788279/28_at5kpr.png": 1920,
-        "v1790788282/29_nd5uw1.png": 1920,
-        "v1790788288/30_gaotnz.png": 1920,
-        "v1790788292/31_lrhmhf.png": 1920,
-        "v1790788297/32_rehx3m.png": 1920,
-        "v1790788302/33_mqiao7.png": 1920,
-        "v1790788309/34_qeubf3.png": 1920,
-        "v1790788312/35_eqn5fm.png": 1920,
-        "v1790788318/36_msbk5n.png": 1920,
-        "v1790788321/37_buk2mj.png": 1920,
-        "v1790788328/38_qfoonh.png": 1920,
-        "v1790788332/39_rnymok.png": 1920
-      }
+      "facts": {
+        "client": "Graduation project, Alexandria University",
+        "year": "2026",
+        "status": "Study"
+      },
+      "kind": "Study"
     },
     {
       "slug": "haret-el-lamoun",
@@ -656,34 +590,27 @@ window.SELVANA = {
         "The project investigates how historical research and local visual identity can be transformed into a believable theatrical environment, creating a space that reflects both the social character and visual memory of its time."
       ],
       "gallery": [
-        "v1790787860/ChatGPT_Image_Sep_26_2026_06_56_37_PM_sodmj2.png",
-        "v1790787822/1_fpmqxw.png",
-        "v1790787826/2_nbjply.png",
         "v1790787854/ChatGPT_Image_Sep_26_2026_06_54_40_PM_sreifd.png",
         "v1790787861/ChatGPT_Image_Sep_26_2026_07_00_08_PM_lyps95.png",
         "v1790787862/ChatGPT_Image_Sep_26_2026_06_58_32_PM_cpa5yv.png",
-        "v1790787825/8_w3aqp6.png",
-        "v1790787829/9_yntbiu.png",
         "v1790787832/ChatGPT_Image_Sep_26_2026_06_42_10_PM_esjdwc.png",
         "v1790787835/ChatGPT_Image_Sep_26_2026_06_49_00_PM_necjd9.png",
         "v1790787850/ChatGPT_Image_Sep_26_2026_06_51_21_PM_oylkxo.png",
-        "v1790787854/ChatGPT_Image_Sep_26_2026_06_54_06_PM_b1u2gw.png"
+        "v1790787854/ChatGPT_Image_Sep_26_2026_06_54_06_PM_b1u2gw.png",
+        {
+          "board": true,
+          "src": "v1790787826/2_nbjply.png"
+        }
       ],
       "renders": true,
-      "widths": {
-        "v1790787860/ChatGPT_Image_Sep_26_2026_06_56_37_PM_sodmj2.png": 1732,
-        "v1790787822/1_fpmqxw.png": 4500,
-        "v1790787826/2_nbjply.png": 4500,
-        "v1790787854/ChatGPT_Image_Sep_26_2026_06_54_40_PM_sreifd.png": 1733,
-        "v1790787861/ChatGPT_Image_Sep_26_2026_07_00_08_PM_lyps95.png": 1733,
-        "v1790787862/ChatGPT_Image_Sep_26_2026_06_58_32_PM_cpa5yv.png": 1733,
-        "v1790787825/8_w3aqp6.png": 4500,
-        "v1790787829/9_yntbiu.png": 4500,
-        "v1790787832/ChatGPT_Image_Sep_26_2026_06_42_10_PM_esjdwc.png": 1732,
-        "v1790787835/ChatGPT_Image_Sep_26_2026_06_49_00_PM_necjd9.png": 1733,
-        "v1790787850/ChatGPT_Image_Sep_26_2026_06_51_21_PM_oylkxo.png": 1732,
-        "v1790787854/ChatGPT_Image_Sep_26_2026_06_54_06_PM_b1u2gw.png": 1733
-      }
+      "facts": {
+        "client": "Faculty of Fine Arts, Alexandria University",
+        "year": {
+          "tbc": "Year?"
+        },
+        "status": "Study"
+      },
+      "kind": "Study"
     },
     {
       "slug": "haret-el-ghagar",
@@ -716,28 +643,473 @@ window.SELVANA = {
         "The project focuses on creating an authentic sense of place through materiality, weathering, scale, light, and environmental storytelling, allowing the location itself to become an active part of the narrative."
       ],
       "gallery": [
-        "v1791061537/selvana/projects/campaign/the-gypsy-quarter/jpdfglpbtsel1fkw2hou.jpg",
-        "v1791061543/selvana/projects/campaign/the-gypsy-quarter/yttgvfw5julprynmozmd.jpg",
         "v1790788394/ChatGPT_Image_Sep_26_2026_06_03_17_PM_fhqflf.png",
         "v1791061517/selvana/projects/campaign/the-gypsy-quarter/nwp9l6mfaekdvira3z71.jpg",
-        "v1791061530/selvana/projects/campaign/the-gypsy-quarter/hnoqqlqbylczuctqo3e0.jpg",
         "v1791061524/selvana/projects/campaign/the-gypsy-quarter/lezhtiqf8w9u9kifxkn2.jpg",
+        "v1791061530/selvana/projects/campaign/the-gypsy-quarter/hnoqqlqbylczuctqo3e0.jpg",
         "v1790788388/16_ejacsh.png",
-        "v1790788401/ChatGPT_Image_Sep_26_2026_06_15_00_PM_phgdvf.png",
-        "v1790788397/ChatGPT_Image_Sep_26_2026_06_14_19_PM_o5xqok.png"
+        "v1791061543/selvana/projects/campaign/the-gypsy-quarter/yttgvfw5julprynmozmd.jpg",
+        "v1790788401/ChatGPT_Image_Sep_26_2026_06_15_00_PM_phgdvf.png"
       ],
       "renders": true,
-      "widths": {
-        "v1791061537/selvana/projects/campaign/the-gypsy-quarter/jpdfglpbtsel1fkw2hou.jpg": 1733,
-        "v1791061543/selvana/projects/campaign/the-gypsy-quarter/yttgvfw5julprynmozmd.jpg": 1023,
-        "v1790788394/ChatGPT_Image_Sep_26_2026_06_03_17_PM_fhqflf.png": 1734,
-        "v1791061517/selvana/projects/campaign/the-gypsy-quarter/nwp9l6mfaekdvira3z71.jpg": 1536,
-        "v1791061530/selvana/projects/campaign/the-gypsy-quarter/hnoqqlqbylczuctqo3e0.jpg": 1734,
-        "v1791061524/selvana/projects/campaign/the-gypsy-quarter/lezhtiqf8w9u9kifxkn2.jpg": 1536,
-        "v1790788388/16_ejacsh.png": 4500,
-        "v1790788401/ChatGPT_Image_Sep_26_2026_06_15_00_PM_phgdvf.png": 1732,
-        "v1790788397/ChatGPT_Image_Sep_26_2026_06_14_19_PM_o5xqok.png": 1733
-      }
+      "facts": {
+        "client": "Faculty of Fine Arts, Alexandria University",
+        "year": {
+          "tbc": "Year?"
+        },
+        "status": "Study"
+      },
+      "kind": "Study"
     }
-  ]
+  ],
+  "dims": {
+    "v1790788446/572040295_18379599217148569_6576358955398261144_n_suhrjj.jpg": [
+      1080,
+      1440
+    ],
+    "v1790788457/573705153_18379599292148569_6236305708123935734_n_y6u5hi.jpg": [
+      1080,
+      1436
+    ],
+    "v1790788461/573835479_18379599283148569_5363533456503602805_n_fgkayy.jpg": [
+      1080,
+      1440
+    ],
+    "v1790788449/572468171_18379599226148569_1103634615938930768_n_d9wpcx.jpg": [
+      1080,
+      1440
+    ],
+    "v1790788453/573211676_18379599301148569_8783623790976227836_n_curhj2.jpg": [
+      1080,
+      1436
+    ],
+    "v1790788465/574529240_18379599250148569_86189204066355755_n_eb84ad.jpg": [
+      1080,
+      1440
+    ],
+    "v1791060991/selvana/projects/direction/lavern/hcigh2nm2hujdwp75kf9.jpg": [
+      1290,
+      1848
+    ],
+    "v1791060899/selvana/projects/direction/lavern/pmlkldmoxefmmx32dysr.jpg": [
+      1605,
+      2006
+    ],
+    "v1791060997/selvana/projects/direction/lavern/yfag2krwvlfiz72jy69e.jpg": [
+      1290,
+      1922
+    ],
+    "v1791060903/selvana/projects/direction/lavern/i9wgso1eoq85xykiq6fe.jpg": [
+      1605,
+      2006
+    ],
+    "v1791060895/selvana/projects/direction/lavern/eto5u5a1xntu4isvjstd.jpg": [
+      1724,
+      2199
+    ],
+    "v1790788572/BHB_lnrfef.jpg": [
+      1280,
+      720
+    ],
+    "v1790788584/SAAS_aybvq7.jpg": [
+      1280,
+      720
+    ],
+    "v1790788581/ChatGPT_Image_Sep_26_2026_05_51_06_PM_gg7kcs.png": [
+      1672,
+      941
+    ],
+    "v1790788576/ccc_a7kxec.jpg": [
+      1280,
+      720
+    ],
+    "v1790788558/2_tnmprw.jpg": [
+      1280,
+      720
+    ],
+    "v1790788568/555_yosamu.jpg": [
+      1280,
+      720
+    ],
+    "v1790787262/15_rvspzu.png": [
+      1920,
+      1080
+    ],
+    "v1790787247/4_bs4n4t.png": [
+      1920,
+      1080
+    ],
+    "v1790787263/16_afcpry.png": [
+      1920,
+      1080
+    ],
+    "v1790787256/11_plmjka.png": [
+      1920,
+      1080
+    ],
+    "v1790787260/13_ovhmgk.png": [
+      1920,
+      1080
+    ],
+    "v1790787252/8_rvw5fn.png": [
+      1920,
+      1080
+    ],
+    "v1790787258/10_z289sw.png": [
+      1920,
+      1080
+    ],
+    "v1790787258/12_qzgnju.png": [
+      1920,
+      1080
+    ],
+    "v1790787250/5_hkbku2.png": [
+      1920,
+      1080
+    ],
+    "v1790787263/7_gjcybx.png": [
+      1920,
+      1080
+    ],
+    "e_trim/c_crop,g_north,h_0.93/v1790787607/colt-16.jpg_speeid.jpg": [
+      4500,
+      2284
+    ],
+    "e_trim/v1790787583/colt_1-04.jpg_rqy0aj.jpg": [
+      4500,
+      2358
+    ],
+    "e_trim/c_crop,g_north,h_0.93/v1790787607/colt-15.jpg_gujmco.jpg": [
+      4500,
+      2284
+    ],
+    "e_trim/v1790787596/colt-11.jpg_ppsmzn.jpg": [
+      4500,
+      2358
+    ],
+    "e_trim/v1790787600/colt-12.jpg_fnzxfs.jpg": [
+      4500,
+      2358
+    ],
+    "e_trim/v1790787606/colt-10.jpg_kwtrdm.jpg": [
+      4500,
+      2358
+    ],
+    "e_trim/v1790787605/colt-14.jpg_dkcgh6.jpg": [
+      4500,
+      2358
+    ],
+    "e_trim/v1790787615/colt-13.jpg_uwgoic.jpg": [
+      4500,
+      2358
+    ],
+    "e_trim/v1790787587/colt_1-07.jpg_zteswk.jpg": [
+      4500,
+      2358
+    ],
+    "e_trim/v1790787590/colt_1-08.jpg_egaa8x.jpg": [
+      4500,
+      2358
+    ],
+    "e_trim/v1790787584/colt_1-05.jpg_z0jkmj.jpg": [
+      4500,
+      2358
+    ],
+    "e_trim/v1790787599/colt_1-17.jpg_x7afur.jpg": [
+      4500,
+      2358
+    ],
+    "e_trim/v1790787603/Untitled_design_27_jchxrn.png": [
+      4500,
+      2358
+    ],
+    "v1790787511/763778425_18116437462839975_747395101484685220_n_pudrqw.jpg": [
+      2148,
+      1126
+    ],
+    "v1790787533/post2-12.jpg_tpnumn.jpg": [
+      4500,
+      2358
+    ],
+    "v1790787511/761585081_18116300281839975_3033399272195792326_n_tfh8nr.jpg": [
+      2148,
+      1126
+    ],
+    "v1790787515/763778681_18116437447839975_6133524750105069368_n_u75hzc.jpg": [
+      2148,
+      1126
+    ],
+    "v1790787515/763992867_18116300221839975_1491342264916999992_n_mz1mva.jpg": [
+      2148,
+      1126
+    ],
+    "v1790787526/post1-06.jpg_h784d1.jpg": [
+      4500,
+      2358
+    ],
+    "v1790787525/post2-11.jpg_kwykkk.jpg": [
+      4500,
+      2358
+    ],
+    "v1790787530/post1-07.jpg_k3vuuq.jpg": [
+      4500,
+      2358
+    ],
+    "v1790787519/764638325_18116300299839975_3854131530924574320_n_y6ekeq.jpg": [
+      2148,
+      1126
+    ],
+    "v1790787520/766121387_18116437456839975_5030975468211388802_n_bqonaw.jpg": [
+      2148,
+      1126
+    ],
+    "v1790787432/marbattt-01.jpg_st68kf.jpg": [
+      5321,
+      3000
+    ],
+    "v1790787435/marbattt-04.jpg_uknhuc.jpg": [
+      5321,
+      3088
+    ],
+    "v1790787439/marbattt-07.jpg_xppwuv.jpg": [
+      5321,
+      2188
+    ],
+    "v1790787441/marbattt-08.jpg_lmd1zs.jpg": [
+      5321,
+      2795
+    ],
+    "v1790787442/marbattt-09.jpg_cmpgc6.jpg": [
+      5321,
+      2188
+    ],
+    "v1790787444/marbattt-10.jpg_mvl4it.jpg": [
+      5321,
+      2188
+    ],
+    "v1790787426/7_idjwp7.png": [
+      1280,
+      720
+    ],
+    "v1790787428/8_slu2ak.png": [
+      1280,
+      720
+    ],
+    "v1790787433/marbattt-02.jpg_xeytxz.jpg": [
+      5321,
+      2188
+    ],
+    "v1790787695/4_rkwlan.png": [
+      1920,
+      1080
+    ],
+    "v1790787688/1_2_r5wkhw.png": [
+      1920,
+      1080
+    ],
+    "v1790787701/5_ncqzuk.png": [
+      1920,
+      1080
+    ],
+    "v1790787706/10_enggob.png": [
+      1920,
+      1080
+    ],
+    "v1790787709/12_cwnagp.png": [
+      1920,
+      1080
+    ],
+    "v1790787712/11_rslyf4.png": [
+      1920,
+      1080
+    ],
+    "v1790787711/16_yvh1hq.png": [
+      1920,
+      1080
+    ],
+    "v1790787714/17_jzbokt.png": [
+      1920,
+      1080
+    ],
+    "v1790787714/18_zv98on.png": [
+      1920,
+      1080
+    ],
+    "v1790787719/24_grupjf.png": [
+      1920,
+      1080
+    ],
+    "v1790787723/26_f8npmi.png": [
+      1920,
+      1080
+    ],
+    "v1790787725/29_g5ou9w.png": [
+      1920,
+      1080
+    ],
+    "v1790787684/2_2_xgwg4v.png": [
+      1920,
+      1080
+    ],
+    "v1790788114/8_b0ewwa.png": [
+      4500,
+      2358
+    ],
+    "v1790788104/6_in7liq.png": [
+      4500,
+      2358
+    ],
+    "v1790788120/11_snmng8.png": [
+      4500,
+      2358
+    ],
+    "v1790788098/4_wrfyec.png": [
+      4500,
+      2358
+    ],
+    "v1790788126/12_cxrbwe.png": [
+      4500,
+      2358
+    ],
+    "v1790788086/3_qnkgpb.png": [
+      4500,
+      2358
+    ],
+    "v1790788121/9_xoieyi.png": [
+      4500,
+      2358
+    ],
+    "v1790788109/7_rpfnyy.png": [
+      4500,
+      2358
+    ],
+    "v1790788119/10_emvoxw.png": [
+      4500,
+      2358
+    ],
+    "v1790788085/2_ag61ee.png": [
+      4500,
+      2358
+    ],
+    "c_crop,x_622,y_320,w_1222,h_683/v1790788204/11_lde4at.png": [
+      1222,
+      683
+    ],
+    "c_crop,x_622,y_320,w_1222,h_683/v1790788232/18_ozqfwm.png": [
+      1222,
+      683
+    ],
+    "c_crop,x_622,y_320,w_1222,h_683/v1790788192/8_bilekx.png": [
+      1222,
+      683
+    ],
+    "c_crop,x_622,y_320,w_1222,h_683/v1790788209/12_p4sl4h.png": [
+      1222,
+      683
+    ],
+    "c_crop,x_622,y_320,w_1222,h_683/v1790788201/10_fd4uy0.png": [
+      1222,
+      683
+    ],
+    "c_crop,x_622,y_320,w_1222,h_683/v1790788178/4_jfr3jt.png": [
+      1222,
+      683
+    ],
+    "c_crop,x_622,y_320,w_1222,h_683/v1790788228/16_c3ftjj.png": [
+      1222,
+      683
+    ],
+    "c_crop,x_622,y_320,w_1222,h_683/v1790788256/23_fxplja.png": [
+      1222,
+      683
+    ],
+    "c_crop,x_622,y_320,w_1222,h_683/v1790788251/22_czjofo.png": [
+      1222,
+      683
+    ],
+    "c_crop,x_622,y_320,w_1222,h_683/v1790788282/29_nd5uw1.png": [
+      1222,
+      683
+    ],
+    "c_crop,x_622,y_320,w_1222,h_683/v1790788279/28_at5kpr.png": [
+      1222,
+      683
+    ],
+    "v1790788292/31_lrhmhf.png": [
+      1920,
+      1080
+    ],
+    "v1790788220/15_c3qgzq.png": [
+      1920,
+      1080
+    ],
+    "v1790787860/ChatGPT_Image_Sep_26_2026_06_56_37_PM_sodmj2.png": [
+      1732,
+      908
+    ],
+    "v1790787861/ChatGPT_Image_Sep_26_2026_07_00_08_PM_lyps95.png": [
+      1733,
+      907
+    ],
+    "v1790787854/ChatGPT_Image_Sep_26_2026_06_54_40_PM_sreifd.png": [
+      1733,
+      907
+    ],
+    "v1790787862/ChatGPT_Image_Sep_26_2026_06_58_32_PM_cpa5yv.png": [
+      1733,
+      907
+    ],
+    "v1790787832/ChatGPT_Image_Sep_26_2026_06_42_10_PM_esjdwc.png": [
+      1732,
+      908
+    ],
+    "v1790787835/ChatGPT_Image_Sep_26_2026_06_49_00_PM_necjd9.png": [
+      1733,
+      907
+    ],
+    "v1790787850/ChatGPT_Image_Sep_26_2026_06_51_21_PM_oylkxo.png": [
+      1732,
+      908
+    ],
+    "v1790787854/ChatGPT_Image_Sep_26_2026_06_54_06_PM_b1u2gw.png": [
+      1733,
+      908
+    ],
+    "v1790787826/2_nbjply.png": [
+      4500,
+      2358
+    ],
+    "v1791061537/selvana/projects/campaign/the-gypsy-quarter/jpdfglpbtsel1fkw2hou.jpg": [
+      1733,
+      907
+    ],
+    "v1790788394/ChatGPT_Image_Sep_26_2026_06_03_17_PM_fhqflf.png": [
+      1734,
+      907
+    ],
+    "v1791061517/selvana/projects/campaign/the-gypsy-quarter/nwp9l6mfaekdvira3z71.jpg": [
+      1536,
+      1024
+    ],
+    "v1791061524/selvana/projects/campaign/the-gypsy-quarter/lezhtiqf8w9u9kifxkn2.jpg": [
+      1536,
+      1024
+    ],
+    "v1791061530/selvana/projects/campaign/the-gypsy-quarter/hnoqqlqbylczuctqo3e0.jpg": [
+      1734,
+      907
+    ],
+    "v1790788388/16_ejacsh.png": [
+      4500,
+      2358
+    ],
+    "v1791061543/selvana/projects/campaign/the-gypsy-quarter/yttgvfw5julprynmozmd.jpg": [
+      1023,
+      1537
+    ],
+    "v1790788401/ChatGPT_Image_Sep_26_2026_06_15_00_PM_phgdvf.png": [
+      1732,
+      908
+    ]
+  }
 };

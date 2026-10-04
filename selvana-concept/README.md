@@ -14,73 +14,76 @@ python3 -m http.server 8080   # then open http://localhost:8080
 
 | File | What it is |
 | --- | --- |
-| `index.html` | Page shell: header, mobile menu, footer, lightbox, curtains, cursor |
-| `styles.css` | Design tokens, layout, motion states, and the print layout for the CV |
+| `index.html` | Page shell: header, mobile menu, footer, lightbox, curtains, cursor, WhatsApp button |
+| `styles.css` | Design tokens, layout, motion states, and the one-page print layout for the CV |
 | `app.js` | In-page router (`#/`, `#/work`, `#/work/<slug>`, `#/cv`, `#/contact`), page templates, motion, cursor |
-| `data.js` | The 12 projects: titles, roles, scope, text, cover/hover images, galleries, films |
-| `assets/` | Hero, portrait and social image, recompressed to WebP (2 MB PNG → 63 KB) |
+| `data.js` | The 12 projects (titles, roles, facts, curated galleries, films) and the size of every image |
+| `assets/` | Hero, portrait, social image, velvet texture, and `selvana-essam-cv.pdf` |
 
 ## Concept: a quiet stage
 
-One idea per screen, images first, and very little text. Two typefaces (Cormorant Garamond for titles, Instrument Sans for text) in two text sizes. Aref Ruqaa is used only for Arabic.
+One idea per screen, images first, and very little text. Two typefaces (Cormorant Garamond for titles, Instrument Sans for text). Aref Ruqaa is used only for Arabic.
 
-The home page has six parts:
+The home page:
 
-1. **Stage.** The stage photo, dimmed. A spotlight follows the cursor (on phones it drifts) with dust floating in the beam. On top sit the name and one line.
-2. **Approach.** One sentence, which lights up word by word as you scroll to it.
-3. **Selected work.** Three projects as large images that stack as you scroll. Each shows only its title and discipline.
-4. **All projects.** A list of titles. Hovering one shows its image next to the cursor and dims the rest. On phones each row has a thumbnail. It can be filtered by *Set design*, *Branding* or *Scenography*.
+1. **Stage.** The stage photo, with a spotlight that follows the cursor and dust in the beam. Within five seconds a visitor reads who she is (*Selvana Essam*), what she does (*Creative direction, branding & set design*), for whom (*brands, campaigns and spaces · Alexandria, Egypt*) and who has hired her (*COLT Coffee · Horse Park · Marbat · CHAI*). Scrolling closes the curtains, and "Act II — The work" invites the visitor in.
+2. **Selected work.** Proof first: COLT Coffee (built), Closer and LAVERN as large stacking cards, each with its discipline and status.
+3. **Approach.** One sentence.
+4. **All projects.** Every project marked *Client*, *Concept* or *Study*, filterable by *Set design*, *Branding* or *Scenography*.
 5. **About.** A portrait, two sentences and a link to the CV.
-6. **Contact.** One large email address, plus WhatsApp, phone and Instagram.
+6. **Contact.** *Message on WhatsApp* and *Email me*, with one line in Arabic.
 
-The other pages:
+Project pages: title, a facts line (client · city · year · status), roles, cover, story, a curated gallery (5–12 images instead of everything), the next project and the contact block. COLT shows the 3D render next to the built drive-thru.
 
-- **Project pages:** title (the Arabic name writes itself on the two Arabic-named projects), one line of roles, the cover, the scope and text, the gallery and the next project.
-- **About page (the CV):** experience, education and skills, plus a **Download CV** button that prints a clean CV.
+The About page is the CV, with a **Download CV (PDF)** button.
 
-Motion: on the first visit the curtain opens, and a curtain titled with the destination page drops between pages. Names appear letter by letter and images open with a curtain wipe. The lightbox zooms out of the thumbnail you clicked.
+Motion: the full curtain intro plays once per visit; after that a short version. A curtain titled with the destination drops between pages, and the project title glides from that curtain into the page. The **Motion** switch in the footer turns animation off or on (it follows the system setting by default).
 
-Cursor (desktop): a dot plus a trailing ring that grows over links and says *View* or *Enlarge* over images. Portraits and covers tilt slightly under it.
+WhatsApp is everywhere: the header menu, the footer, every contact block, and a floating button on phones (hidden over the stage and next to the contact block).
 
-The **Motion** switch in the footer turns animation off or on. It follows the system setting by default.
+## This round
 
-Finishing touches:
+**From the engineering, UI and motion reviews**
 
-- **Real velvet.** The intro curtain, the page-change curtain and the closing curtains use velvet taken from the stage photo itself (`assets/velvet.webp`, 23 KB).
-- **The show ends as you scroll.** The stage stays pinned while the curtains close over it, then the site continues.
-- **Smooth scrolling** on desktop ([Lenis](https://github.com/darkroomengineering/lenis)). Phones keep their native scrolling.
-- **Images fade in** once loaded instead of popping in. Hovering a project starts loading its cover so the page opens instantly.
-- **Sharpness.** Every image is served up to its original resolution (stored as `widths` in `data.js`) and never upscaled. The featured LAVERN card and cover use the sharpest still instead of the 960 px film, and the film sits in the gallery.
-- **Clean cursor.** Dark ink on light sections, cream on dark ones, instead of colour inversion.
-- **Fonts first.** The intro waits for the fonts, so the name never flashes in a fallback typeface.
+- Fast clicks between pages no longer leave the wrong page on screen; the router always settles on the latest address.
+- The skip link and in-page links no longer open a "not found" page.
+- Screen readers hear headings as words, not letters; the hidden menu and the page behind the lightbox can't be reached with Tab.
+- Every image has its size set, so lazy loading works (the Bridge page loads 2 images up front instead of the whole gallery) and the page doesn't jump.
+- Smooth scrolling loads only on desktop; the animation loop sleeps when nothing moves; the grain and spotlight stop when off screen.
+- Films play only while visible, have a Pause button, and don't autoplay with reduced motion or data saver.
+- Lightbox opens instantly with the thumbnail, then sharpens; it zooms back to where it came from.
+- Tap targets are at least 44 px; focus rings are visible on dark sections.
 
-## How each review issue was fixed
+**From the CV-reader, recruiter and psychology reviews**
 
-| Review issue | Fix |
-| --- | --- |
-| The first screen was a blank white page | The stage photo, name, role and links are on the first screen immediately |
-| The top bar overlapped the content | The header is transparent only over the stage. Everywhere else it has a solid background with a blur, and it hides while you scroll down |
-| The 3D carousel hid the work and showed text backwards | A front-facing work index and grid, plus three large featured projects |
-| Names didn't match across the site | One name per discipline everywhere: **Art Direction & Set Design**, **Branding & Creative Direction**, **Scenography & Spatial Design** |
-| There was no "work with me" moment | "Start a project" in the header, on the stage, on every project page and in the CV. The contact form opens email or WhatsApp with the brief already written and also copies it |
-| "Featured" showed only one project | Three featured projects |
-| The About photo cut off the face | The portrait is cropped from the stage photo with the face fully in frame |
-| The homepage loaded 14–17 MB | Images are sized to the screen and lazy-loaded, and films only load and play while on screen |
-| Grey labels were hard to read | Every text colour meets WCAG AA contrast |
-| Possible AI-generated images | Projects whose own scope lists 3D work are labelled "Includes 3D visualizations and concept renders" |
+1. The curtain closes and invites the visitor into "Act II — The work".
+2. Clearer first five seconds (role, audience, city, clients on the stage).
+3. Proof first: built and shot client work leads.
+4. A facts line on every project. Unknown facts are shown as dashed placeholders (for example *Year?*), never guessed.
+5. Curated galleries with a consistent shape.
+6. WhatsApp everywhere.
+7. A shorter intro after the first visit.
+8. A touch of Arabic in the contact block.
+9. A real one-page CV PDF.
 
-## Confirm with the client before going live
+## Questions for Selvana before going live
 
-1. **WhatsApp**: does +20 150 100 3126 have WhatsApp?
-2. **Name spellings.** These were changed; please confirm each one:
-   - **CHAIi → CHAI**: the logo in the renders reads "CHAI".
-   - **Hara El Lymon → Haret El Lamoun** (حارة الليمون).
-   - **Hara El Ghagar → Haret El Ghagar** (حارة الغجر).
-   - **Smile Café**: the logo in the images says "Smile Line". Which name is correct?
-3. **Portrait**: a proper portrait photo would beat the crop from the stage photo.
-4. **Image files named `ChatGPT_Image_…`** (Haret El Lamoun, Haret El Ghagar, Re-Play): rename them on Cloudinary, and replace any that aren't Selvana's own renders.
-5. **CV PDF**: the print layout works now. A designed PDF could replace it later.
-6. **Arabic font**: the boards use a calligraphy font that isn't on Google Fonts. If the original font file is available, it can replace Aref Ruqaa in one line of `styles.css`.
+Every dashed placeholder on the site is listed here. Answers go into `data.js` (replace `{ "tbc": "Year?" }` with the value).
+
+1. **For each project:** client name, city, year, and whether it was built, launched or shot. Who else was on the team, and what was her exact part?
+2. **Titles:** is "Creative Director & Partner, Vana Creative Studio" the right title? Same for Vana Room and Bab Ashra.
+3. **LAVERN or LAVERNE?** And what is "Atlantis Homme"?
+4. **AI-assisted images.** Files named `ChatGPT_Image_…` (Haret El Lamoun, Haret El Ghagar, Re-Play) should be labelled honestly or replaced with her own renders.
+5. **Availability:** open to freelance, full-time, relocation? A LinkedIn link and an email on her own domain would help recruiters.
+6. **Her name in Arabic,** spelled the way she writes it.
+7. **An on-set photo** of her working, for the stage or About section, and one or two short client quotes.
+8. **English level:** keep "upper-intermediate" or reword?
+9. **Name spellings** changed from the current site: CHAIi → CHAI, Hara El Lymon → Haret El Lamoun, Hara El Ghagar → Haret El Ghagar, and Smile Café vs "Smile Line" (the logo in the images).
+10. **WhatsApp:** confirm +20 150 100 3126 is the number to use.
+
+## CV PDF
+
+`assets/selvana-essam-cv.pdf` is printed from the About page's print layout. To regenerate it after editing the CV, open `#/cv` in Chrome, choose Print → Save as PDF (A4, background graphics on), and save over the file.
 
 ## For production
 
